@@ -1,0 +1,2281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador de Crédito/EFI Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== VARIABLES ===== */
+    :root {
+      --navy: #0a2540;
+      --blue: #0b4f91;
+      --teal: #00b4a0;
+      --green: #00a86b;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --soft: #f0fdf4;
+      --warn: #fefce8;
+      --input-bg: #ffffff;
+      --tooltip-bg: #1e293b;
+      --tooltip-color: #f1f5f9;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      --error: #dc2626;
+      --spinner-color: #00b4a0;
+    }
+    [data-dark="1"] {
+      --navy: #b4d4ff;
+      --blue: #38bdf8;
+      --teal: #4dd4c8;
+      --green: #6ee7b7;
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --line: #334155;
+      --soft: #134e4a;
+      --warn: #3d2e05;
+      --input-bg: #0f172a;
+      --tooltip-bg: #f1f5f9;
+      --tooltip-color: #0f172a;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      --error: #f87171;
+      --spinner-color: #4dd4c8;
+    }
+
+    /* ===== RESET ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, opacity 0.3s, transform 0.3s;
+    }
+    body {
+      font-family: 'Inter', Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wrap {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 12px 12px 30px;
+    }
+
+    /* ===== TIPOGRAFÍA ===== */
+    h1, h2, h3, h4 {
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--navy);
+    }
+    h1 { font-size: 24px; }
+    h2 { font-size: 18px; margin-bottom: 6px; }
+    h3 { font-size: 15px; margin-bottom: 4px; }
+    .text-muted { color: var(--muted); font-size: 13px; }
+
+    /* ===== HERO ===== */
+    .hero {
+      background: linear-gradient(135deg, #0a2540, #1a4a6e);
+      color: white;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .hero:after {
+      content: "";
+      position: absolute;
+      right: -20px;
+      top: -30px;
+      width: 140px;
+      height: 140px;
+      background: rgba(0, 180, 160, 0.15);
+      border-radius: 50%;
+      transform: rotate(20deg);
+    }
+    .hero h1 { color: white; margin-bottom: 2px; font-size: 22px; }
+    .hero p { opacity: 0.8; font-size: 13px; margin-bottom: 2px; }
+    .hero .pill {
+      display: inline-block;
+      background: rgba(0, 180, 160, 0.2);
+      border: 1px solid rgba(0, 180, 160, 0.3);
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      color: white;
+      margin-top: 2px;
+    }
+    .date-line { font-size: 11px; opacity: 0.8; margin-top: 4px; }
+
+    /* ===== PESTAÑAS ===== */
+    .producto-toggle-wrap {
+      display: inline-flex;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 30px;
+      padding: 3px;
+      gap: 3px;
+      backdrop-filter: blur(2px);
+      margin-top: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .producto-toggle-wrap .label-credito,
+    .producto-toggle-wrap .label-efi {
+      padding: 4px 14px;
+      border-radius: 24px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: rgba(255, 255, 255, 0.7);
+      background: transparent;
+      border: none;
+      font-family: 'Inter', Arial, sans-serif;
+      user-select: none;
+    }
+    .producto-toggle-wrap .label-credito.active,
+    .producto-toggle-wrap .label-efi.active {
+      background: white;
+      color: #0a2540;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      transform: scale(1.02);
+    }
+
+    /* ===== UNIDAD TABS (mejorado) ===== */
+    .unidad-tabs {
+      display: flex;
+      gap: 4px;
+      margin-top: 2px;
+    }
+    .unidad-tabs label {
+      flex: 1;
+      text-align: center;
+      border: 1px solid var(--line);
+      border-bottom: 3px solid transparent;
+      border-radius: 6px 6px 0 0;
+      padding: 4px 6px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      background: var(--card);
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    .unidad-tabs label.active-unidad {
+      border-color: var(--line);
+      border-bottom-color: var(--teal);
+      background: var(--soft);
+      color: var(--teal);
+      font-weight: 800;
+    }
+    .unidad-tabs label.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+      border-color: var(--line);
+      color: var(--muted);
+    }
+    .unidad-tabs label:hover:not(.disabled) {
+      background: var(--soft);
+    }
+
+    /* ===== TARJETAS ===== */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      box-shadow: var(--shadow);
+      margin-bottom: 10px;
+      transition: box-shadow 0.3s;
+    }
+    .card:hover { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+
+    /* ===== RESULTADOS ===== */
+    .hero-results { display: flex; flex-direction: column; gap: 8px; }
+    .amount-card {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: center;
+      border-radius: 10px;
+      padding: 10px 14px;
+      border: 2px solid var(--teal);
+      background: var(--card);
+    }
+    .amount-card.primary-pay {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: white;
+    }
+    .circle-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 180, 160, 0.12);
+      font-size: 18px;
+    }
+    .primary-pay .circle-icon { background: rgba(255, 255, 255, 0.2); }
+    .amount-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--teal);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .primary-pay .amount-label { color: rgba(255, 255, 255, 0.8); }
+    .amount-value {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--navy);
+      line-height: 1.1;
+    }
+    .primary-pay .amount-value { color: white; }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .mini-card {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: var(--card);
+    }
+    .mini-card.full { grid-column: 1 / -1; }
+    .mini-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--soft);
+      font-size: 14px;
+    }
+    .mini-label { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; }
+    .mini-value { font-size: 15px; font-weight: 800; color: var(--navy); margin-top: 1px; }
+    .hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .hint.error-hint { color: var(--error); font-weight: 700; display: none; }
+
+    /* ===== RESUMEN ===== */
+    .resumen-panel .result {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 6px;
+      align-items: center;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .resumen-panel .result:last-child { border-bottom: none; }
+    .summary-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--soft);
+      font-size: 12px;
+    }
+    .money { font-weight: 800; font-size: 15px; color: var(--navy); }
+
+    /* ===== CONTACTO ===== */
+    .contact-card {
+      border: 2px solid var(--teal);
+      background: var(--card);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    .contact-card .qr-wrap { margin: 0; }
+    .contact-card .advisor-name { font-size: 16px; font-weight: 800; color: var(--navy); }
+    .contact-card .contact-line { font-size: 12px; color: var(--text); margin: 2px 0; }
+
+    /* ===== BOTONES ===== */
+    .tools {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    button, a.btn {
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      background: var(--navy);
+      color: white;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    button:hover, a.btn:hover { transform: scale(1.02); box-shadow: var(--shadow); }
+    button.secondary { background: var(--line); color: var(--text); }
+    button.green { background: var(--teal); }
+    button.purple { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+    button.danger { background: #dc2626; }
+    .whatsapp { background: #25D366; }
+    .btn-wa-cliente { background: #25D366; }
+
+    /* ===== INPUTS ===== */
+    label { display: block; font-weight: 700; margin: 4px 0 2px; font-size: 12px; }
+    input, select {
+      width: 100%;
+      font-size: 13px;
+      padding: 6px 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--card);
+      color: var(--text);
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    input:focus, select:focus {
+      outline: 2px solid var(--teal);
+      border-color: transparent;
+    }
+    input.error { border-color: var(--error); outline-color: var(--error); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    /* ===== TOGGLES ===== */
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--card);
+      margin-top: 6px;
+    }
+    .switch {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      flex: 0 0 auto;
+    }
+    .switch input { display: none; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: var(--line);
+      border-radius: 999px;
+      transition: 0.2s;
+    }
+    .slider:before {
+      content: "";
+      position: absolute;
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.2s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .switch input:checked + .slider { background: var(--teal); }
+    .switch input:checked + .slider:before { transform: translateX(16px); }
+
+    /* ===== OPCIONES AVANZADAS (acordeón) ===== */
+    .advanced-toggle {
+      cursor: pointer;
+      user-select: none;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--teal);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .advanced-toggle:hover { color: var(--navy); }
+    .advanced-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s;
+      opacity: 0;
+      padding: 0 2px;
+    }
+    .advanced-content.open {
+      max-height: 800px;
+      opacity: 1;
+      padding: 8px 2px 0;
+    }
+
+    /* ===== OPT-FIELDS (CORREGIDO) ===== */
+    .opt-fields {
+      display: none;
+      margin-top: 4px;
+    }
+    .opt-fields.show {
+      display: block;
+    }
+
+    /* ===== TABLAS ===== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 4px;
+      font-size: 12px;
+    }
+    th, td {
+      padding: 4px 6px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+    th { background: var(--soft); color: var(--navy); font-weight: 700; }
+    td:last-child { text-align: right; font-weight: 700; color: var(--navy); }
+
+    /* ===== IA PANEL ===== */
+    .ia-panel {
+      background: var(--soft);
+      border-left: 4px solid var(--teal);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-top: 10px;
+      display: none;
+    }
+    .ia-panel.show { display: block; }
+    .ia-panel .ia-badge {
+      display: inline-block;
+      background: var(--teal);
+      color: white;
+      padding: 1px 8px;
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+    .ia-panel h3 { margin: 0 0 2px; color: var(--teal); font-size: 14px; }
+    .ia-panel p { margin: 2px 0; font-size: 12px; line-height: 1.5; }
+
+    /* ===== QR ===== */
+    .qr-wrap canvas {
+      border-radius: 6px;
+      border: 2px solid var(--teal);
+      max-width: 50px;
+      height: auto;
+    }
+    [data-dark="1"] .qr-wrap canvas { border-color: var(--teal); }
+
+    /* ===== FAB ===== */
+    .fab-container {
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      z-index: 500;
+      display: flex;
+      gap: 8px;
+      padding-bottom: env(safe-area-inset-bottom);
+      pointer-events: none;
+    }
+    .fab-container .fab-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-weight: 800;
+      font-size: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      transition: transform 0.25s, opacity 0.25s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      opacity: 0;
+      transform: translateY(20px);
+      pointer-events: none;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .fab-container.show .fab-btn {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .fab-calc { background: var(--teal); color: white; }
+    .fab-cliente { background: #7c3aed; color: white; }
+    .fab-cliente.active { background: #dc2626; }
+
+    /* ===== LOADER ===== */
+    .loader-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    .loader-overlay.active { display: flex; }
+    .loader-spinner {
+      width: 36px;
+      height: 36px;
+      border: 4px solid var(--line);
+      border-top-color: var(--spinner-color);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== MODO CLIENTE ===== */
+    body.modo-cliente .advisor-inputs { display: none !important; }
+    body.modo-cliente .dark-toggle-wrap { display: none !important; }
+    body.modo-cliente .technical { display: none !important; }
+    body.modo-cliente .amort-section { display: none !important; }
+    body.modo-cliente .historial-section { display: none !important; }
+    body.modo-cliente .stats-section { display: none !important; }
+    body.modo-cliente .btn-guardar { display: none !important; }
+    body.modo-cliente .btn-pdf { display: none !important; }
+    body.modo-cliente .btn-email { display: none !important; }
+    body.modo-cliente .toggle { display: none !important; }
+    body.modo-cliente .opt-block { display: none !important; }
+    body.modo-cliente .unidad-tabs { display: none !important; }
+    body.modo-cliente .row .hint { display: none !important; }
+    body.modo-cliente .contact-card .tools { display: none !important; }
+    body.modo-cliente .capture { display: none !important; }
+    body.modo-cliente .print-btn { display: none !important; }
+    body.modo-cliente .calc-btn { display: none !important; }
+    body.modo-cliente .hero .producto-toggle-wrap { display: none !important; }
+    body.modo-cliente #cardFooter { display: none !important; }
+    body.modo-cliente .ia-panel { display: none !important; }
+    .modo-cliente-badge {
+      display: none;
+      position: fixed;
+      bottom: 14px;
+      right: 14px;
+      z-index: 999;
+      background: var(--teal);
+      color: white;
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-weight: 700;
+      font-size: 11px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+    }
+    body.modo-cliente .modo-cliente-badge { display: block; }
+
+    /* ===== DARK TOGGLE ===== */
+    .dark-toggle-wrap {
+      position: fixed;
+      top: 8px;
+      right: 8px;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 8px;
+      box-shadow: var(--shadow);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 600px) {
+      .wrap { padding: 8px 6px 20px; }
+      .hero { padding: 12px 14px; }
+      .hero h1 { font-size: 18px; }
+      .amount-value { font-size: 20px; }
+      .mini-value { font-size: 13px; }
+      .row { grid-template-columns: 1fr; }
+      .tools button, .tools a { width: 100%; justify-content: center; }
+      .fab-container .fab-btn { padding: 6px 12px; font-size: 11px; }
+      .contact-card { grid-template-columns: 1fr; text-align: center; }
+      .qr-wrap { justify-content: center; }
+    }
+
+    /* ===== PRINT ===== */
+    @media print {
+      .dark-toggle-wrap, .modo-cliente-badge, .hero, #pageFooter,
+      .advisor-inputs, .historial-section, .stats-section, .tools,
+      .toggle, .msg, .capture, .print-btn, .calc-btn, .btn-guardar,
+      .btn-pdf, .btn-email, .fab-container, .loader-overlay { display: none !important; }
+      .card { box-shadow: none !important; border: 1px solid #ddd; padding: 6px !important; margin-bottom: 4px !important; }
+      .grid { display: grid !important; grid-template-columns: 1.2fr 0.8fr !important; gap: 4px !important; }
+      .amount-value { font-size: 18px !important; }
+      .qr-wrap canvas { max-width: 40px !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- LOADER -->
+  <div class="loader-overlay" id="loaderOverlay">
+    <div class="loader-spinner"></div>
+  </div>
+
+  <div class="dark-toggle-wrap" id="darkToggleWrap" title="Modo oscuro">
+    <span id="darkIcon">🌙</span>
+    <label class="switch" style="margin:0;width:30px;height:16px;"><input type="checkbox" id="darkSwitch"><span class="slider"></span></label>
+  </div>
+  <div class="modo-cliente-badge" id="modoClienteBadge">👤 Modo cliente — toca para salir</div>
+
+  <!-- FAB -->
+  <div class="fab-container" id="fabContainer" role="toolbar">
+    <button type="button" class="fab-btn fab-calc" id="fabCalcBtn">🧮 Calcular</button>
+    <button type="button" class="fab-btn fab-cliente" id="fabClienteBtn">👤 Cliente</button>
+  </div>
+
+  <div class="wrap">
+    <div class="hero">
+      <h1 id="tituloPrincipal">Simulador de Crédito/EFI Pro</h1>
+      <p id="subtituloPrincipal">Simulación Personalizada — v15</p>
+      <span class="pill">🔹 Herramienta de Apoyo Comercial</span>
+      <div class="date-line">📅 <b id="fechaSim"></b></div>
+      <div class="producto-toggle-wrap" id="productoToggleWrap" role="tablist">
+        <span class="label-credito active" id="labelCredito" data-producto="credito" role="tab" aria-selected="true" tabindex="0">Crédito</span>
+        <span class="label-efi" id="labelEfi" data-producto="efi" role="tab" aria-selected="false" tabindex="-1">EFI</span>
+      </div>
+    </div>
+
+    <section class="card" id="mainCard">
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-weight:700;"><span>👤</span> Simulación para:</div>
+      <div class="client-name-display" id="clienteDisplay" style="font-size:24px;font-weight:900;color:var(--navy);margin:2px 0 4px;">CLIENTE INTERESADO</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-weight:700;"><span>🤝</span> Asesor: <span class="text-value" id="advisorTopDisplay" style="font-weight:900;color:var(--navy);">Abraham Fernando Ulloa O.</span></div>
+
+      <div class="info-banner" style="display:flex;gap:8px;align-items:flex-start;background:var(--soft);border-radius:8px;padding:6px 10px;margin:8px 0;color:var(--text);font-size:12px;">
+        <span style="background:var(--teal);color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-weight:900;flex:0 0 auto;font-size:12px;">i</span>
+        <div>Los montos presentados son un valor aproximado y no representan una oferta formal.</div>
+      </div>
+
+      <div class="grid">
+        <section>
+          <div class="hero-results">
+            <div class="amount-card fade-slide show" id="amountCardMonto">
+              <div class="circle-icon">💵</div>
+              <div>
+                <div class="amount-label">Monto del crédito</div>
+                <div class="amount-value" id="montoHero">$0.00</div>
+              </div>
+            </div>
+            <div class="amount-card primary-pay fade-slide show" id="amountCardPago">
+              <div class="circle-icon">💳</div>
+              <div>
+                <div class="amount-label" id="labelPagoPrincipal">Pago periódico</div>
+                <div class="amount-value" id="pagoPeriodoHero">$0.00</div>
+              </div>
+            </div>
+          </div>
+          <div class="mini-grid">
+            <div class="mini-card fade-slide show" id="miniPrimerPago" style="display:none">
+              <div class="mini-icon">📅</div>
+              <div>
+                <div class="mini-label" id="labelPrimerPago">Primer pago</div>
+                <div class="mini-value" id="primerPagoHero">$0.00</div>
+                <div class="hint" id="primerPagoDetalle">Pago regular</div>
+              </div>
+            </div>
+            <div class="mini-card fade-slide show" id="miniComision">
+              <div class="mini-icon">💸</div>
+              <div>
+                <div class="mini-label">Disposición</div>
+                <div class="mini-value" id="comisionHero">$0.00</div>
+              </div>
+            </div>
+            <div class="mini-card fade-slide show" id="miniSeguro">
+              <div class="mini-icon">🛡️</div>
+              <div>
+                <div class="mini-label">Seguro</div>
+                <div class="mini-value" id="seguroHero">$0.00</div>
+                <div class="hint" id="netoDetalle">Recibes: $0.00</div>
+              </div>
+            </div>
+            <div class="mini-card full fade-slide show">
+              <div class="mini-icon">📆</div>
+              <div>
+                <div class="mini-label" id="labelPlazoMini">Plazo</div>
+                <div class="mini-value" id="plazoHero">12 quincenas</div>
+                <div class="hint" id="costoDiaInline">≈ $0.00 / día</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="resumen-aside">
+          <section class="card resumen-panel" style="box-shadow:none;padding:8px 0;">
+            <h3 style="font-size:14px;">Resumen</h3>
+            <div class="result fade-slide show"><span class="summary-icon">💵</span><span>Monto</span><span class="money" id="montoResumen">$0.00</span></div>
+            <div class="result fade-slide show" id="netoResumenRow" style="display:none"><span class="summary-icon">🏦</span><span>Neto</span><span class="money" id="netoResumen">$0.00</span></div>
+            <div class="result fade-slide show"><span class="summary-icon">📆</span><span id="labelPlazoResumen">Plazo</span><span class="money" id="plazoResumen">0</span></div>
+            <div class="result fade-slide show"><span class="summary-icon">💳</span><span id="labelPagoResumen">Pago</span><span class="money" id="pagoResumen">$0.00</span></div>
+            <div class="result fade-slide show" style="font-size:12px;"><span class="summary-icon">📈</span><span>Tasa anual</span><span class="money" id="interesResumen" style="font-size:13px;">0%</span></div>
+          </section>
+        </aside>
+      </div>
+
+      <!-- PANEL IA -->
+      <div class="ia-panel" id="iaPanel">
+        <div class="ia-badge">🧠 Recomendación</div>
+        <h3 id="iaTitle">Consejo personalizado</h3>
+        <p id="iaMessage">Ajusta los parámetros para recibir sugerencias.</p>
+        <p id="iaDetail" style="font-size:11px;color:var(--muted);"></p>
+      </div>
+
+      <section class="contact-card">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <div class="qr-wrap" id="qrWrap" style="margin:0;"></div>
+        </div>
+        <div>
+          <div class="advisor-name" id="advisorDisplay">Abraham Fernando Ulloa O.</div>
+          <div class="contact-line"><b>Asesor de crédito</b></div>
+          <hr style="border:0;border-top:1px solid var(--line);margin:4px 0;">
+          <div class="contact-line"><b>📱 WhatsApp:</b> <span id="advisorPhoneDisplay">374 117 9005</span></div>
+          <div class="tools">
+            <a class="btn whatsapp" id="waBtn" target="_blank" rel="noopener"><span>🟢</span> Contactar</a>
+            <button class="btn-wa-cliente" id="waClienteBtn">💬 Cliente</button>
+          </div>
+          <div class="note" style="background:var(--warn);border:1px solid #f0dca9;border-radius:8px;padding:4px 8px;font-size:11px;color:#5d4a16;margin-top:4px;">📩 Solicita más información</div>
+        </div>
+      </section>
+      <div class="footer" id="cardFooter" style="margin-top:6px;border-top:1px solid var(--line);padding-top:4px;font-size:10px;color:var(--muted);text-align:center;">
+        <div>Simulación informativa sujeta a evaluación</div>
+        <div id="creatorLegendCard" style="margin-top:1px;">• Herramienta de apoyo comercial</div>
+      </div>
+    </section>
+
+    <section class="card advisor-inputs" style="margin-top:8px;">
+      <h3 style="font-size:14px;">📋 Datos del asesor</h3>
+      <div class="row">
+        <div>
+          <label for="advisorInput">Nombre</label>
+          <input id="advisorInput" type="text" value="Abraham Fernando Ulloa O." />
+        </div>
+        <div>
+          <label for="advisorPhoneInput">WhatsApp</label>
+          <input id="advisorPhoneInput" type="tel" value="3741179005" placeholder="Ej. 3741179005" />
+          <div id="phoneHint" class="hint error-hint">⚠️ 10 dígitos</div>
+        </div>
+      </div>
+
+      <hr style="border:0;border-top:1px solid var(--line);margin:8px 0;" />
+
+      <h3 style="font-size:14px;">📊 Datos de simulación</h3>
+      <div class="row">
+        <div>
+          <label for="cliente">Cliente</label>
+          <input id="cliente" type="text" placeholder="Opcional" value="" list="clientesDatalist" autocomplete="off" />
+          <datalist id="clientesDatalist"></datalist>
+        </div>
+        <div>
+          <label for="clienteTel">WhatsApp cliente</label>
+          <input id="clienteTel" type="tel" placeholder="Ej. 3741179005" maxlength="10" autocomplete="off" />
+          <div class="hint">Opcional</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="monto">Monto $</label>
+          <input id="monto" type="number" min="1" step="0.01" value="46700" placeholder="Ej. 46700" aria-required="true" />
+        </div>
+        <div>
+          <label for="plazo">Plazo</label>
+          <input id="plazo" type="number" min="1" max="168" step="1" value="120" placeholder="Ej. 120" aria-required="true" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="interes">Interés anual %</label>
+          <input id="interes" type="number" min="0" step="0.01" value="37.47" aria-required="true" />
+        </div>
+        <div>
+          <label>Unidad</label>
+          <div class="unidad-tabs" id="unidadTabs">
+            <label id="tabQuincena" class="active-unidad"><input type="radio" name="unidad" value="quincena" checked style="display:none;">Quincenas</label>
+            <label id="tabMes"><input type="radio" name="unidad" value="mes" style="display:none;">Meses</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="iva">IVA %</label>
+          <input id="iva" type="number" min="0" step="0.01" value="16" aria-required="true" />
+        </div>
+        <div>
+          <label for="ingresos">Ingresos mensuales</label>
+          <input id="ingresos" type="number" min="0" step="100" value="" placeholder="Ej. 15000" />
+          <div class="hint">Para recomendaciones</div>
+        </div>
+      </div>
+
+      <!-- EFI: Ajuste BBVA (solo visible en EFI) -->
+      <div id="efiAdjustWrapper" style="display:none;margin-top:4px;">
+        <div class="toggle" style="border-color:var(--teal);">
+          <div style="font-size:12px;"><b>🎯 Ajustar a pago BBVA (tasa ajustada)</b><div class="hint" style="font-size:10px;">Coincide exactamente con Efectivo Inmediato</div></div>
+          <label class="switch"><input type="checkbox" id="ajusteBBVA"><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <!-- DISPOSICIÓN (solo EFI) - CORREGIDO: sin display:none inline -->
+      <div class="opt-block" id="dispBlock" style="display:none;border:1px solid var(--line);border-radius:8px;padding:8px;margin-top:6px;background:var(--card);">
+        <div class="toggle" style="border:none;padding:0;background:transparent;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div style="font-size:12px;"><b>💸 Disposición</b><div class="hint" style="font-size:10px;">% sobre el monto</div></div>
+          <label class="switch"><input type="checkbox" id="aplicaDisp"><span class="slider"></span></label>
+        </div>
+        <!-- Quitado el style="display:none" inline para que funcione la clase .show -->
+        <div class="opt-fields" id="dispFields" style="margin-top:4px;">
+          <label for="dispPct" style="font-size:11px;">Disposición %</label>
+          <input id="dispPct" type="number" min="0" step="0.01" value="2.75" style="padding:4px 6px;font-size:12px;" />
+        </div>
+      </div>
+
+      <!-- SEGURO (solo Crédito) - CORREGIDO: sin display:none inline -->
+      <div class="opt-block" id="seguroBlock" style="border:1px solid var(--line);border-radius:8px;padding:8px;margin-top:6px;background:var(--card);">
+        <div class="toggle" style="border:none;padding:0;background:transparent;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div style="font-size:12px;"><b>🛡️ Seguro</b><div class="hint" style="font-size:10px;">Se descuenta del monto</div></div>
+          <label class="switch"><input type="checkbox" id="aplicaSeguro"><span class="slider"></span></label>
+        </div>
+        <!-- Quitado el style="display:none" inline para que funcione la clase .show -->
+        <div class="opt-fields" id="seguroFields" style="margin-top:4px;">
+          <label for="seguroMonto" style="font-size:11px;">Monto ($)</label>
+          <input id="seguroMonto" type="number" min="0" step="0.01" value="2098.41" style="padding:4px 6px;font-size:12px;" />
+        </div>
+      </div>
+
+      <!-- OPCIONES AVANZADAS (colapsable) -->
+      <div style="margin-top:8px;">
+        <div class="advanced-toggle" id="advancedToggle">⚙️ Opciones avanzadas <span id="advancedIcon">▶</span></div>
+        <div class="advanced-content" id="advancedContent">
+          <div class="toggle"><div style="font-size:12px;"><b>Mostrar análisis detallado</b><div class="hint" style="font-size:10px;">Comparador de plazos</div></div><label class="switch"><input type="checkbox" id="showTech"><span class="slider"></span></label></div>
+          <div class="toggle"><div style="font-size:12px;"><b>📊 Gráfica de barras</b></div><label class="switch"><input type="checkbox" id="showBars"><span class="slider"></span></label></div>
+          <div class="toggle"><div style="font-size:12px;"><b>📋 Tabla de amortización</b></div><label class="switch"><input type="checkbox" id="showAmort"><span class="slider"></span></label></div>
+          <div class="toggle"><div style="font-size:12px;"><b>🗂️ Mostrar resumen</b></div><label class="switch"><input type="checkbox" id="showResumen" checked><span class="slider"></span></label></div>
+          <div class="toggle" style="border-color:var(--teal);"><div style="font-size:12px;"><b>👤 Modo cliente</b><div class="hint" style="font-size:10px;">Oculta controles</div></div><label class="switch"><input type="checkbox" id="modoCliente"><span class="slider"></span></label></div>
+        </div>
+      </div>
+
+      <div class="tools" style="margin-top:8px;">
+        <button type="button" class="green calc-btn" id="calcBtn">Calcular</button>
+        <button type="button" class="secondary print-btn" id="printBtn">🖨️ Imprimir</button>
+        <button type="button" class="purple capture" id="captureBtn">📸 Capturar</button>
+        <button type="button" class="btn-guardar" style="background:var(--teal);color:white;" id="guardarBtn">💾 Guardar</button>
+        <button type="button" class="pdf btn-pdf" style="background:#e74c3c;color:white;" id="pdfBtn">📄 PDF</button>
+        <button type="button" class="email btn-email" style="background:#3498db;color:white;" id="emailBtn">✉️ Correo</button>
+        <button type="button" class="secondary" id="resetBtn" style="background:#f1f5f9;color:var(--text);">↺ Reiniciar</button>
+      </div>
+      <div id="msg" class="msg" role="status" aria-live="polite" style="display:none;margin-top:6px;padding:6px;border-radius:8px;background:#e9f8f8;color:#075c5c;font-weight:700;font-size:12px;">✅ Simulación actualizada</div>
+
+      <!-- ESTADÍSTICAS -->
+      <div class="stats-section" id="statsSection" style="margin-top:8px;border-top:1px solid var(--line);padding-top:6px;">
+        <h3 style="font-size:13px;">📊 Estadísticas del asesor</h3>
+        <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:6px;margin-top:4px;">
+          <div class="stat-card" style="background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:6px;text-align:center;"><div class="stat-number" id="statTotal" style="font-size:18px;font-weight:900;color:var(--navy);">0</div><div class="stat-label" style="font-size:10px;color:var(--muted);">Simulaciones</div></div>
+          <div class="stat-card" style="background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:6px;text-align:center;"><div class="stat-number" id="statPromedio" style="font-size:18px;font-weight:900;color:var(--navy);">$0</div><div class="stat-label" style="font-size:10px;color:var(--muted);">Monto prom.</div></div>
+          <div class="stat-card" style="background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:6px;text-align:center;"><div class="stat-number" id="statCredito" style="font-size:18px;font-weight:900;color:var(--navy);">0</div><div class="stat-label" style="font-size:10px;color:var(--muted);">Créditos</div></div>
+          <div class="stat-card" style="background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:6px;text-align:center;"><div class="stat-number" id="statEFI" style="font-size:18px;font-weight:900;color:var(--navy);">0</div><div class="stat-label" style="font-size:10px;color:var(--muted);">EFI</div></div>
+        </div>
+        <div class="hint" style="font-size:10px;margin-top:2px;">Basado en simulaciones guardadas</div>
+      </div>
+
+      <!-- HISTORIAL -->
+      <div class="historial-section" id="historialSection" style="margin-top:8px;border-top:1px solid var(--line);padding-top:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
+          <h3 style="font-size:13px;margin:0;">📋 Historial</h3>
+          <button class="danger" id="limpiarHistorialBtn" style="padding:2px 10px;font-size:10px;background:#dc2626;color:white;border:none;border-radius:6px;font-weight:700;cursor:pointer;">🗑️ Limpiar</button>
+        </div>
+        <div class="historial-toolbar" style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-top:4px;">
+          <input type="text" id="historialSearch" class="historial-search" placeholder="🔍 Buscar…" autocomplete="off" style="flex:1;min-width:100px;font-size:12px;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--text);" />
+          <label class="agrupar-toggle" style="display:flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--navy);white-space:nowrap;"><input type="checkbox" id="agruparClienteChk"> Agrupar</label>
+        </div>
+        <div class="historial-grid" id="historialGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px;margin-top:4px;"></div>
+        <div class="cliente-grid" id="clienteGrid" style="display:none;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px;margin-top:4px;"></div>
+        <div id="clienteDetalle" style="display:none;"></div>
+        <div class="hint" style="font-size:10px;margin-top:2px;" id="historialHint">Haz clic para cargar</div>
+      </div>
+    </section>
+
+    <!-- TÉCNICO (oculto por defecto) -->
+    <section class="card technical" id="technical" style="display:none;margin-top:4px;">
+      <h3 style="font-size:14px;">Resumen financiero (interno)</h3>
+      <div class="tech-grid" style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:8px;">
+        <div>
+          <h4 style="font-size:13px;">Comparador de plazos</h4>
+          <div class="plazo-checks-wrap"><div class="plazo-checks" id="plazoChecks" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;"></div></div>
+          <div class="note" style="background:var(--warn);border:1px solid #f0dca9;border-radius:6px;padding:4px 8px;font-size:11px;color:#5d4a16;margin-top:4px;">Monto: <b id="montoComparador">$0.00</b></div>
+          <table style="font-size:11px;margin-top:4px;">
+            <thead><tr><th id="thPlazo">Plazo</th><th>Sin IVA</th><th id="thPagoReal">Con IVA</th></tr></thead>
+            <tbody id="comparison"></tbody>
+          </table>
+          <div id="barChart" class="bar-chart" style="display:none;margin:6px 0;"></div>
+        </div>
+        <div>
+          <h4 style="font-size:13px;">Resumen técnico</h4>
+          <div class="result" style="display:grid;grid-template-columns:auto 1fr auto;gap:4px;align-items:center;padding:4px 0;border-bottom:1px solid var(--line);font-size:11px;"><span class="summary-icon" style="width:20px;height:20px;font-size:10px;">🔒</span><span>Monto máximo</span><span class="money" id="totalConIva" style="font-size:13px;">$0.00</span></div>
+          <div class="result" style="display:grid;grid-template-columns:auto 1fr auto;gap:4px;align-items:center;padding:4px 0;border-bottom:1px solid var(--line);font-size:11px;"><span class="summary-icon" style="width:20px;height:20px;font-size:10px;">💰</span><span>Costo financiero</span><span class="money" id="costoFinanciero" style="font-size:13px;">$0.00</span></div>
+          <div class="result" style="display:grid;grid-template-columns:auto 1fr auto;gap:4px;align-items:center;padding:4px 0;border-bottom:1px solid var(--line);font-size:11px;"><span class="summary-icon" style="width:20px;height:20px;font-size:10px;">📊</span><span>CAT (interno)</span><span class="money" id="catTech" style="font-size:13px;">0%</span></div>
+          <div class="result" style="display:grid;grid-template-columns:auto 1fr auto;gap:4px;align-items:center;padding:4px 0;"><span class="summary-icon" style="width:20px;height:20px;font-size:10px;">💵</span><span>Total a pagar</span><span class="money" id="totalPagarResumen" style="font-size:13px;">$0.00</span></div>
+        </div>
+      </div>
+      <div class="info-banner" style="display:flex;gap:6px;align-items:flex-start;background:var(--soft);border-radius:6px;padding:6px 10px;margin:6px 0;color:var(--text);font-size:11px;">
+        <span style="background:var(--teal);color:white;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-weight:900;flex:0 0 auto;font-size:10px;">i</span>
+        <div>CAT es una aproximación, validar contra cotización oficial.</div>
+      </div>
+    </section>
+
+    <!-- AMORTIZACIÓN (oculta por defecto) -->
+    <section class="card amort-section" id="amortSection" style="display:none;margin-top:4px;">
+      <h3 style="font-size:14px;">📋 Tabla de amortización (interno)</h3>
+      <div style="overflow-x:auto;">
+        <table class="amort-table" style="font-size:11px;margin-top:4px;">
+          <thead><tr><th style="padding:3px 4px;">#</th><th id="thAmortPago" style="padding:3px 4px;">Pago</th><th style="padding:3px 4px;">Capital</th><th style="padding:3px 4px;">Interés</th><th style="padding:3px 4px;">Saldo</th></tr></thead>
+          <tbody id="amortBody"></tbody>
+        </table>
+      </div>
+      <div class="hint" style="font-size:10px;margin-top:4px;">Valores estimados con tasa fija.</div>
+    </section>
+
+    <div class="footer" id="pageFooter" style="text-align:center;color:var(--muted);font-size:11px;margin-top:12px;border-top:1px solid var(--line);padding-top:8px;">
+      Simulación informativa sujeta a evaluación • v15
+      <div id="creatorLegend" style="margin-top:2px;">• Herramienta de apoyo comercial</div>
+    </div>
+  </div>
+
+  <!-- Librerías -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    // ============================================================
+    //  CÓDIGO JAVASCRIPT COMPLETO (corregido)
+    // ============================================================
+
+    // ---------- AUXILIARES ----------
+    const $ = id => document.getElementById(id);
+    const DEFAULT_ADVISOR_NAME = 'Abraham Fernando Ulloa O.';
+    const DEFAULT_ADVISOR_PHONE = '3741179005';
+    const money = n => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(isFinite(n) ? n : 0);
+    const read = id => parseFloat($(id).value) || 0;
+    const today = () => new Date().toLocaleDateString('es-MX', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    const setText = (id, value) => { const el = $(id); if (el) el.textContent = value; };
+    const onlyDigits = value => String(value || '').replace(/\D/g, '');
+    const formatPhone = value => {
+      const d = onlyDigits(value);
+      if (d.length === 10) return d.slice(0, 3) + ' ' + d.slice(3, 6) + ' ' + d.slice(6);
+      return value || '';
+    };
+    const waPhone = value => {
+      const d = onlyDigits(value);
+      if (d.length === 10) return '52' + d;
+      if (d.startsWith('52')) return d;
+      return d;
+    };
+    const unidadCorta = (unidad) => unidad === 'quincena' ? 'quincenal' : 'mensual';
+
+    // ---------- SPINNER ----------
+    const showLoader = () => $('loaderOverlay').classList.add('active');
+    const hideLoader = () => $('loaderOverlay').classList.remove('active');
+
+    // ---------- TOGGLE OPCIONES AVANZADAS ----------
+    $('advancedToggle').addEventListener('click', function() {
+      const content = $('advancedContent');
+      const icon = $('advancedIcon');
+      content.classList.toggle('open');
+      icon.textContent = content.classList.contains('open') ? '▼' : '▶';
+    });
+
+    // ---------- PRODUCTO ----------
+    let productoActual = localStorage.getItem('producto') || 'credito';
+
+    function aplicarProducto(producto) {
+      productoActual = producto;
+      localStorage.setItem('producto', producto);
+      const isEfi = producto === 'efi';
+
+      document.querySelectorAll('.producto-toggle-wrap [role="tab"]').forEach(el => {
+        const isActive = el.dataset.producto === producto;
+        el.classList.toggle('active', isActive);
+        el.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        el.setAttribute('tabindex', isActive ? '0' : '-1');
+      });
+
+      // Mostrar/ocultar ajuste BBVA
+      $('efiAdjustWrapper').style.display = isEfi ? '' : 'none';
+
+      if (isEfi) {
+        $('dispBlock').style.display = '';
+        $('seguroBlock').style.display = 'none';
+        $('aplicaSeguro').checked = false;
+        $('seguroFields').classList.remove('show');
+        $('seguroMonto').value = 0;
+        const radioMes = document.querySelector('input[name="unidad"][value="mes"]');
+        const radioQuincena = document.querySelector('input[name="unidad"][value="quincena"]');
+        if (radioMes) radioMes.checked = true;
+        if (radioQuincena) radioQuincena.disabled = true;
+        $('tabQuincena').classList.add('disabled');
+        $('tabMes').classList.remove('disabled');
+      } else {
+        $('dispBlock').style.display = 'none';
+        $('seguroBlock').style.display = '';
+        $('aplicaDisp').checked = false;
+        $('dispFields').classList.remove('show');
+        $('dispPct').value = 0;
+        const radioQuincena = document.querySelector('input[name="unidad"][value="quincena"]');
+        if (radioQuincena) radioQuincena.disabled = false;
+        $('tabQuincena').classList.remove('disabled');
+        $('tabMes').classList.remove('disabled');
+        // Desmarcar ajuste BBVA si no es EFI
+        $('ajusteBBVA').checked = false;
+      }
+
+      const tasaDefault = isEfi ? 45 : 37.47;
+      $('interes').value = tasaDefault;
+
+      const unidad = isEfi ? 'mes' : 'quincena';
+      const radio = document.querySelector(`input[name="unidad"][value="${unidad}"]`);
+      if (radio) radio.checked = true;
+      applyUnidadUI();
+
+      const plazoDefault = isEfi ? 12 : 120;
+      $('plazo').value = plazoDefault;
+
+      calc();
+    }
+
+    document.querySelectorAll('.producto-toggle-wrap [role="tab"]').forEach(el => {
+      el.addEventListener('click', function() {
+        const producto = this.dataset.producto;
+        if (producto === productoActual) return;
+        aplicarProducto(producto);
+      });
+      el.addEventListener('keydown', function(e) {
+        const tabs = Array.from(document.querySelectorAll('.producto-toggle-wrap [role="tab"]'));
+        const idx = tabs.indexOf(this);
+        let newIdx = -1;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          newIdx = (idx + 1) % tabs.length;
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          newIdx = (idx - 1 + tabs.length) % tabs.length;
+        }
+        if (newIdx !== -1) {
+          const newTab = tabs[newIdx];
+          const producto = newTab.dataset.producto;
+          if (producto !== productoActual) {
+            aplicarProducto(producto);
+          }
+          newTab.focus();
+        }
+      });
+    });
+
+    // ---------- UNIDAD DE TIEMPO ----------
+    function unidadActual() {
+      const el = document.querySelector('input[name="unidad"]:checked');
+      return el ? el.value : 'quincena';
+    }
+    const periodsPerYear = (unidad) => unidad === 'quincena' ? 24 : 12;
+    const unidadLabel = (unidad, n) => {
+      if (unidad === 'quincena') return `${n} ${n === 1 ? 'quincena' : 'quincenas'}`;
+      return `${n} ${n === 1 ? 'mes' : 'meses'}`;
+    };
+    const PLAZOS_QUINCENA = [12, 24, 36, 48, 60, 72, 84, 96, 108, 120, 132, 144, 156, 168];
+    const PLAZOS_MES = [3, 6, 9, 12, 18, 24, 36, 48, 60, 72, 84];
+
+    function applyUnidadUI() {
+      const unidad = unidadActual();
+      const isEfi = productoActual === 'efi';
+      $('tabQuincena').classList.toggle('active-unidad', unidad === 'quincena' && !isEfi);
+      $('tabMes').classList.toggle('active-unidad', unidad === 'mes');
+      if (isEfi) {
+        $('tabQuincena').classList.add('disabled');
+        const radioQuincena = document.querySelector('input[name="unidad"][value="quincena"]');
+        if (radioQuincena) radioQuincena.disabled = true;
+        const radioMes = document.querySelector('input[name="unidad"][value="mes"]');
+        if (radioMes) radioMes.checked = true;
+      }
+      const max = unidad === 'quincena' ? 168 : 84;
+      $('plazo').max = String(max);
+      $('plazo').placeholder = `1-${max}`;
+      let plazo = Math.round(read('plazo'));
+      if (plazo > max) { plazo = max;
+        $('plazo').value = String(max); }
+    }
+    document.querySelectorAll('input[name="unidad"]').forEach(el => {
+      el.addEventListener('change', () => { applyUnidadUI();
+        calc(); });
+    });
+
+    // ---------- DATOS DEL ASESOR ----------
+    function loadAdvisorData() {
+      const savedName = localStorage.getItem('advisorName') || DEFAULT_ADVISOR_NAME;
+      const savedPhone = localStorage.getItem('advisorPhone') || DEFAULT_ADVISOR_PHONE;
+      if ($('advisorInput')) $('advisorInput').value = savedName;
+      if ($('advisorPhoneInput')) $('advisorPhoneInput').value = savedPhone;
+    }
+
+    function getAdvisorData() {
+      const name = (($('advisorInput') && $('advisorInput').value) || DEFAULT_ADVISOR_NAME).trim() || DEFAULT_ADVISOR_NAME;
+      const phone = onlyDigits(($('advisorPhoneInput') && $('advisorPhoneInput').value) || DEFAULT_ADVISOR_PHONE) || DEFAULT_ADVISOR_PHONE;
+      return { name, phone };
+    }
+
+    function saveAdvisorData() {
+      const data = getAdvisorData();
+      localStorage.setItem('advisorName', data.name);
+      localStorage.setItem('advisorPhone', data.phone);
+    }
+
+    // ---------- VALIDACIÓN TELÉFONO ----------
+    function validatePhone() {
+      const input = $('advisorPhoneInput');
+      const hint = $('phoneHint');
+      const digits = onlyDigits(input.value);
+      if (digits.length > 0 && digits.length !== 10) {
+        input.classList.add('error');
+        hint.style.display = 'block';
+        return false;
+      } else {
+        input.classList.remove('error');
+        hint.style.display = 'none';
+        return true;
+      }
+    }
+    const phoneInput = $('advisorPhoneInput');
+    phoneInput.addEventListener('blur', validatePhone);
+    phoneInput.addEventListener('input', function() {
+      if (this.classList.contains('error')) {
+        validatePhone();
+      }
+    });
+    setTimeout(validatePhone, 100);
+
+    // ---------- MOTOR FINANCIERO ----------
+    function paymentBase(monto, i, n) {
+      if (i === 0) return n ? monto / n : 0;
+      return monto * i / (1 - Math.pow(1 + i, -n));
+    }
+
+    function approxCAT(disbursed, flows, periodsYear) {
+      if (disbursed <= 0 || !flows.length) return 0;
+      let lo = 0.00001,
+        hi = 0.2;
+      const npv = r => {
+        let v = -disbursed;
+        flows.forEach((f, idx) => { v += f / Math.pow(1 + r, idx + 1); });
+        return v;
+      };
+      if (npv(lo) < 0) return 0;
+      for (let k = 0; k < 100; k++) {
+        const mid = (lo + hi) / 2;
+        if (npv(mid) > 0) lo = mid;
+        else hi = mid;
+      }
+      const r = (lo + hi) / 2;
+      return (Math.pow(1 + r, periodsYear) - 1) * 100;
+    }
+
+    function mostrarMensaje(texto, esError = false) {
+      const msg = $('msg');
+      msg.textContent = texto;
+      msg.className = 'msg' + (esError ? ' error' : '');
+      msg.style.display = 'block';
+      if (!esError) {
+        setTimeout(() => msg.style.display = 'none', 3000);
+      }
+    }
+
+    function validarCampos(silent) {
+      const monto = read('monto');
+      const plazo = Math.round(read('plazo'));
+      const maxPlazo = unidadActual() === 'quincena' ? 168 : 84;
+      let valid = true;
+      document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+
+      if (monto <= 0) {
+        if (!silent) mostrarMensaje('❌ El monto debe ser mayor a 0.', true);
+        $('monto').classList.add('error');
+        valid = false;
+      }
+      if (plazo < 1 || plazo > maxPlazo) {
+        if (!silent) mostrarMensaje(`❌ El plazo debe ser entre 1 y ${maxPlazo}.`, true);
+        $('plazo').classList.add('error');
+        valid = false;
+      }
+      return valid;
+    }
+
+    let ultimosValores = {};
+
+    // ---------- CÁLCULO PRINCIPAL ----------
+    function calc(silent) {
+      if (!validarCampos(silent)) return;
+
+      const unidad = unidadActual();
+      const ppy = periodsPerYear(unidad);
+      const isEfi = productoActual === 'efi';
+
+      setText('labelPagoPrincipal', `Pago ${unidadCorta(unidad)}`);
+      setText('labelPagoResumen', `Pago ${unidadCorta(unidad)}`);
+      setText('thAmortPago', 'Pago');
+
+      const cliente = $('cliente').value.trim();
+      const clienteTel = onlyDigits($('clienteTel').value);
+      let monto = read('monto');
+      let anual = read('interes');
+      const ivaPct = read('iva');
+      let plazo = Math.round(parseFloat($('plazo').value) || 1);
+      const maxPlazo = unidad === 'quincena' ? 168 : 84;
+      if (plazo > maxPlazo) { plazo = maxPlazo;
+        $('plazo').value = String(maxPlazo); }
+      if (plazo < 1) { plazo = 1;
+        $('plazo').value = '1'; }
+      $('plazo').value = String(plazo);
+
+      localStorage.setItem('lastMonto', String(monto));
+      localStorage.setItem('lastPlazo', String(plazo));
+      localStorage.setItem('lastInteres', String(anual));
+
+      // --- AJUSTE BBVA para EFI ---
+      const ajusteBBVA = $('ajusteBBVA').checked && isEfi;
+      let tasaEfectiva = anual;
+      if (ajusteBBVA) {
+        tasaEfectiva = anual * 1.01818;
+        ultimosValores.tasaAjustada = tasaEfectiva;
+      } else {
+        ultimosValores.tasaAjustada = anual;
+      }
+
+      const aplicaDisp = $('aplicaDisp').checked;
+      const dispPct = read('dispPct');
+      const aplicaSeguro = $('aplicaSeguro').checked;
+      const seguroMonto = read('seguroMonto');
+
+      const dispMonto = monto * dispPct / 100;
+      const hayDisp = aplicaDisp && dispMonto > 0 && isEfi;
+      const haySeguro = aplicaSeguro && seguroMonto > 0 && !isEfi;
+
+      const i = tasaEfectiva / 100 / ppy;
+      const pagoBase = paymentBase(monto, i, plazo);
+
+      // CRÉDITO: pago con IVA incluido
+      // EFI: pago sin IVA
+      const pagoPeriodico = isEfi ? pagoBase : pagoBase * (1 + ivaPct / 100);
+
+      // Comisión por disposición: sin IVA, se suma al primer pago (solo EFI)
+      const dispTotal = dispMonto;
+
+      const montoNeto = monto - (haySeguro ? seguroMonto : 0);
+
+      const primerPago = (isEfi && hayDisp) ? pagoPeriodico + dispTotal : pagoPeriodico;
+      const mostrarPrimerPago = isEfi && hayDisp;
+
+      const totalPagar = pagoPeriodico * plazo + (hayDisp ? dispTotal : 0);
+      const costoFinanciero = totalPagar - monto;
+      const totalIntereses = totalPagar - monto;
+
+      ultimosValores = {
+        cliente: cliente || 'Cliente interesado',
+        clienteTel,
+        monto,
+        anual,
+        ivaPct,
+        plazo,
+        unidad,
+        isEfi,
+        pagoPeriodico,
+        totalPagar,
+        costoFinanciero,
+        totalIntereses,
+        hayDisp,
+        dispTotal,
+        haySeguro,
+        seguroMonto,
+        montoNeto,
+        primerPago,
+        mostrarPrimerPago,
+        tasaAjustada: tasaEfectiva,
+        ajusteBBVA
+      };
+
+      // CAT calculado con flujos sin IVA (para ambos) y tasa base sin ajuste
+      const flowsSinIva = [];
+      if (hayDisp) flowsSinIva.push(dispMonto);
+      for (let k = 0; k < plazo; k++) flowsSinIva.push(pagoBase);
+      const cat = approxCAT(montoNeto, flowsSinIva, ppy);
+      ultimosValores.cat = cat;
+
+      $('miniComision').style.display = (isEfi && hayDisp) ? '' : 'none';
+      $('miniSeguro').style.display = (!isEfi && haySeguro) ? '' : 'none';
+      $('miniPrimerPago').style.display = mostrarPrimerPago ? '' : 'none';
+      $('netoResumenRow').style.display = haySeguro ? '' : 'none';
+
+      setText('fechaSim', today());
+      saveAdvisorData();
+      const advisor = getAdvisorData();
+      setText('advisorDisplay', advisor.name);
+      setText('advisorTopDisplay', advisor.name);
+      setText('advisorPhoneDisplay', formatPhone(advisor.phone));
+      setText('creatorLegend', '• Herramienta de simulación desarrollada por ' + advisor.name + ' para apoyo comercial.');
+      setText('creatorLegendCard', '• Herramienta de simulación desarrollada por ' + advisor.name + ' para apoyo comercial.');
+
+      const nombreCliente = (cliente || 'Cliente interesado')
+        .toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+      setText('clienteDisplay', nombreCliente);
+
+      setText('montoHero', money(monto));
+      setText('montoResumen', money(monto));
+      setText('netoResumen', money(montoNeto));
+      setText('plazoResumen', unidadLabel(unidad, plazo));
+      const tasaMostrar = ajusteBBVA ? tasaEfectiva : anual;
+      setText('interesResumen', tasaMostrar.toFixed(2) + '%');
+      setText('pagoResumen', money(pagoPeriodico));
+      setText('pagoPeriodoHero', money(pagoPeriodico));
+      setText('primerPagoHero', money(primerPago));
+
+      const detallePrimerPago = (isEfi && hayDisp) ?
+        `Pago regular (${money(pagoPeriodico)}) + disposición ${dispPct.toFixed(2)}% (${money(dispTotal)}) = ${money(primerPago)}, cargado en el primer periodo` :
+        `Pago regular desde el primer periodo`;
+      setText('primerPagoDetalle', detallePrimerPago);
+      setText('comisionHero', money(dispTotal));
+      setText('seguroHero', money(seguroMonto));
+      setText('netoDetalle', `Recibes: ${money(montoNeto)}`);
+
+      setText('labelPlazoMini', 'Plazo');
+      setText('plazoHero', unidadLabel(unidad, plazo));
+      setText('labelPlazoResumen', 'Plazo');
+
+      const costoDiaEl = $('costoDiaInline');
+      if (costoDiaEl) {
+        const dias = unidad === 'quincena' ? 15 : 30;
+        costoDiaEl.textContent = '≈ ' + money(pagoPeriodico / dias) + ' / día';
+        costoDiaEl.style.display = '';
+      }
+
+      setText('totalConIva', money(totalPagar));
+      setText('costoFinanciero', money(costoFinanciero));
+      setText('catTech', cat.toFixed(2) + '%');
+      setText('montoComparador', money(monto));
+      setText('totalIntereses', money(totalIntereses));
+      setText('totalPagarResumen', money(totalPagar));
+
+      buildComparison(monto, tasaEfectiva, ivaPct, plazo, unidad, ppy);
+      updateWhatsAppLink();
+      buildAmort(monto, tasaEfectiva, ivaPct, plazo, ppy, dispMonto, hayDisp);
+      if (!silent) mostrarMensaje('✅ Simulación actualizada');
+
+      actualizarEstadisticas();
+      generarRecomendacionIA();
+    }
+
+    // ---------- INTELIGENCIA ARTIFICIAL SIMULADA ----------
+    function generarRecomendacionIA() {
+      const panel = $('iaPanel');
+      const title = $('iaTitle');
+      const message = $('iaMessage');
+      const detail = $('iaDetail');
+
+      const monto = ultimosValores.monto || 0;
+      const plazo = ultimosValores.plazo || 1;
+      const pago = ultimosValores.pagoPeriodico || 0;
+      const isEfi = ultimosValores.isEfi || false;
+      const ingresos = read('ingresos');
+
+      if (monto <= 0 || plazo < 1) {
+        panel.classList.remove('show');
+        return;
+      }
+      panel.classList.add('show');
+
+      let recomendacion = '';
+      let detalle = '';
+
+      if (ingresos > 0) {
+        const porcentaje = (pago / (ingresos / 2)) * 100;
+        if (porcentaje > 40) {
+          recomendacion += '⚠️ El pago supera el 40% de tus ingresos quincenales. Considera un plazo más largo o un monto menor. ';
+        } else if (porcentaje > 30) {
+          recomendacion += '📊 El pago es adecuado (≈' + Math.round(porcentaje) + '% de ingresos). Estás dentro de un rango saludable. ';
+        } else {
+          recomendacion += '✅ Excelente capacidad de pago. Podrías evaluar un plazo más corto para ahorrar intereses. ';
+        }
+        detalle += `Pago: ${money(pago)} (${Math.round(porcentaje)}% de ingreso quincenal). `;
+      } else {
+        recomendacion += '💡 Ingresa tus ingresos mensuales para recomendaciones más precisas. ';
+      }
+
+      if (monto > 50000 && !isEfi) {
+        recomendacion += '🏦 Para montos > $50,000, el Crédito tradicional suele ser más conveniente. ';
+      } else if (monto <= 50000 && isEfi) {
+        recomendacion += '⚡ EFI es adecuado para montos pequeños y plazos cortos. ';
+      } else if (monto > 50000 && isEfi) {
+        recomendacion += '⚠️ EFI tiene tasas más altas; para montos grandes, evalúa Crédito tradicional. ';
+      }
+
+      const plazoOptimo = Math.min(Math.max(Math.round(monto / 5000), 12), 168);
+      if (plazo > plazoOptimo + 12) {
+        recomendacion += `⏳ Podrías reducir el plazo a ${plazoOptimo} periodos para ahorrar intereses. `;
+      } else if (plazo < plazoOptimo - 12 && pago > 0) {
+        recomendacion += `📈 Considera extender el plazo a ${plazoOptimo} periodos para reducir el pago. `;
+      } else {
+        recomendacion += '👍 El plazo elegido es equilibrado. ';
+      }
+
+      title.textContent = '🧠 Recomendación personalizada';
+      message.textContent = recomendacion;
+      detail.textContent = detalle + 'Estas sugerencias son orientativas y no constituyen asesoría financiera profesional.';
+    }
+
+    // ---------- COMPARADOR DE PLAZOS ----------
+    let activePlazosQuincena = new Set(
+      JSON.parse(localStorage.getItem('activePlazosQuincena') || 'null') || [24, 60, 120, 168]
+    );
+    let activePlazosMes = new Set(
+      JSON.parse(localStorage.getItem('activePlazosMes') || 'null') || [12, 24, 48, 84]
+    );
+
+    function activePlazosFor(unidad) { return unidad === 'quincena' ? activePlazosQuincena : activePlazosMes; }
+
+    function saveActivePlazos(unidad) {
+      const key = unidad === 'quincena' ? 'activePlazosQuincena' : 'activePlazosMes';
+      localStorage.setItem(key, JSON.stringify([...activePlazosFor(unidad)]));
+    }
+
+    function buildPlazoChecks(selected, unidad) {
+      const container = $('plazoChecks');
+      if (!container) return;
+      const list = unidad === 'quincena' ? PLAZOS_QUINCENA : PLAZOS_MES;
+      const active = activePlazosFor(unidad);
+      const suffix = unidad === 'quincena' ? 'q' : 'm';
+      container.innerHTML = list.map(p => {
+        const checked = active.has(p) ? 'checked' : '';
+        const isSelected = p === selected;
+        const pillClass = isSelected ? ' selected-pill' : '';
+        const star = isSelected ? ' ⭐' : '';
+        return `<label class="${pillClass}" style="display:inline-flex;align-items:center;gap:3px;border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-weight:600;font-size:11px;cursor:pointer;background:var(--card);color:var(--text);">
+          <input type="checkbox" value="${p}" ${checked} onchange="onPlazoCheck(this)" style="cursor:pointer;margin:0;width:12px;height:12px;">
+          ${p}${suffix}${star}
+        </label>`;
+      }).join('');
+    }
+
+    function onPlazoCheck(el) {
+      const unidad = unidadActual();
+      const p = parseInt(el.value);
+      const active = activePlazosFor(unidad);
+      if (el.checked) active.add(p);
+      else active.delete(p);
+      saveActivePlazos(unidad);
+      const monto = read('monto');
+      const anual = read('interes');
+      const ivaPct = read('iva');
+      const selected = Math.round(parseFloat($('plazo').value) || 1);
+      const isEfi = productoActual === 'efi';
+      const tasaEfectiva = ($('ajusteBBVA').checked && isEfi) ? anual * 1.01818 : anual;
+      renderComparatorTable(monto, tasaEfectiva, ivaPct, selected, unidad, periodsPerYear(unidad));
+    }
+    window.onPlazoCheck = onPlazoCheck;
+
+    function renderComparatorTable(monto, anual, ivaPct, selected, unidad, ppy) {
+      const active = activePlazosFor(unidad);
+      const plazos = [...new Set([...active, selected])].sort((a, b) => a - b);
+      const isEfi = productoActual === 'efi';
+      const i = anual / 100 / ppy;
+      const rows = plazos.map(p => {
+        const pb = paymentBase(monto, i, p);
+        const pagoSinIva = pb;
+        const pagoConIva = pb * (1 + ivaPct / 100);
+        const pagoMostrado = isEfi ? pagoSinIva : pagoConIva;
+        const cls = p === selected ? ' class="selected-term"' : '';
+        const star = p === selected ? ' ⭐' : '';
+        return `<tr${cls}><td>${unidadLabel(unidad, p)}${star}</td><td>${money(pagoSinIva)}</td><td>${money(pagoMostrado)}</td></tr>`;
+      }).join('');
+      $('comparison').innerHTML = rows;
+      renderBarChart(plazos, monto, i, ivaPct, selected, unidad, isEfi);
+    }
+
+    function buildComparison(monto, anual, ivaPct, selected, unidad, ppy) {
+      setText('thPlazo', 'Plazo');
+      buildPlazoChecks(selected, unidad);
+      renderComparatorTable(monto, anual, ivaPct, selected, unidad, ppy);
+    }
+
+    // ---------- GRÁFICA DE BARRAS ----------
+    function paintBars(items) {
+      const chart = $('barChart');
+      if (!chart) return;
+      const max = Math.max(...items.map(x => x.v), 0);
+      chart.innerHTML = items.map(({ label, v, active }) => {
+        const pct = max ? (v / max * 100).toFixed(1) : 0;
+        return `<div class="bar-row" style="display:grid;grid-template-columns:40px 1fr 45px;gap:4px;align-items:center;font-size:10px;">
+          <div style="font-weight:700;color:var(--navy);">${label}${active ? ' ⭐' : ''}</div>
+          <div class="bar-bg" style="background:var(--line);border-radius:999px;height:12px;overflow:hidden;"><div class="bar-fill${active ? ' active' : ''}" style="height:100%;background:${active ? 'var(--green)' : 'var(--teal)'};border-radius:999px;width:${pct}%;transition:width 0.4s;" title="${money(v)}"></div></div>
+          <div class="bar-label" style="font-weight:700;color:var(--navy);text-align:right;font-size:10px;">${money(v)}</div>
+        </div>`;
+      }).join('');
+    }
+
+    function renderBarChart(plazos, monto, i, ivaPct, selected, unidad, isEfi) {
+      const items = plazos.map(p => {
+        const pb = paymentBase(monto, i, p);
+        const v = isEfi ? pb : pb * (1 + ivaPct / 100);
+        return { label: unidadLabel(unidad, p).replace(/quincenas?|meses?/, unidad === 'quincena' ? 'q' : 'm'), v: v,
+          active: p === selected };
+      });
+      paintBars(items);
+    }
+
+    // ---------- WHATSAPP / QR ----------
+    function leadText() {
+      const advisor = getAdvisorData();
+      const firstName = advisor.name.split(' ')[0] || 'asesor';
+      return `Hola ${firstName}! 👋
+
+    Vi la simulación de crédito y me interesa recibir más información sobre las opciones disponibles.
+
+    Quedo atento(a). Gracias.`;
+    }
+
+    function updateWhatsAppLink() {
+      const btn = $('waBtn');
+      const advisor = getAdvisorData();
+      const url = `https://wa.me/${waPhone(advisor.phone)}?text=${encodeURIComponent(leadText())}`;
+      if (btn) btn.href = url;
+      buildQR(advisor.phone);
+    }
+    let qrInstance = null;
+    let lastQrPhone = null;
+
+    function buildQR(phone) {
+      const wrap = $('qrWrap');
+      if (!wrap) return;
+      if (qrInstance && phone === lastQrPhone) return;
+      lastQrPhone = phone;
+      const url = `https://wa.me/${waPhone(phone)}?text=${encodeURIComponent('Hola! Vi la simulación de crédito y me interesa recibir más información.')}`;
+      wrap.innerHTML = '';
+      try {
+        qrInstance = new QRCode(wrap, {
+          text: url,
+          width: 50,
+          height: 50,
+          colorDark: '#072146',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } catch (e) {}
+    }
+
+    // ---------- WHATSAPP CLIENTE ----------
+    function enviarWhatsAppCliente() {
+      const v = ultimosValores;
+      if (!v || !v.monto) {
+        mostrarMensaje('❌ Primero calcula una simulación.', true);
+        return;
+      }
+      let digits = v.clienteTel && v.clienteTel.length === 10 ? v.clienteTel : '';
+      if (!digits) {
+        const numeroCliente = prompt('📱 Ingresa el número de WhatsApp del cliente (10 dígitos):', '');
+        if (!numeroCliente) return;
+        digits = onlyDigits(numeroCliente);
+      }
+      if (digits.length !== 10) {
+        mostrarMensaje('❌ El número debe tener 10 dígitos.', true);
+        return;
+      }
+      const numeroCompleto = waPhone(digits); // Normaliza con 52
+      const advisor = getAdvisorData();
+      const nombreCliente = (v.cliente && v.cliente !== 'Cliente interesado') ? v.cliente.split(' ')[0] : '';
+      const producto = v.isEfi ? 'EFI' : 'Crédito';
+      const tasaMostrar = v.tasaAjustada ? v.tasaAjustada : v.anual;
+      const mensaje = `Hola${nombreCliente ? ' ' + nombreCliente : ''}! 👋
+
+    Tengo lista tu propuesta de ${producto}, ¡échale un vistazo! 🎉
+
+    💰 *Monto disponible:* ${money(v.monto)}
+    📆 *A pagar en:* ${v.plazo} ${v.unidad === 'quincena' ? 'quincenas' : 'meses'}
+    💳 *Pago ${unidadCorta(v.unidad)}:* ${money(v.pagoPeriodico)}
+    ${v.mostrarPrimerPago ? `📅 *Primer pago (incluye disposición):* ${money(v.primerPago)}` : ''}
+    📈 *Tasa anual:* ${tasaMostrar.toFixed(2)}%
+    ${v.haySeguro ? `🛡️ *Seguro:* ${money(v.seguroMonto)}` : ''}
+    ${v.haySeguro ? `🏦 *Neto a recibir:* ${money(v.montoNeto)}` : ''}
+    📅 *Oferta válida hasta el:* ${new Date(Date.now() + 5 * 86400000).toLocaleDateString('es-MX', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+
+    Estoy para resolver cualquier duda y ayudarte a avanzar con tu solicitud. 😊
+
+    ${advisor.name}
+    WhatsApp: ${formatPhone(advisor.phone)}
+    `;
+
+      const url = `https://wa.me/${numeroCompleto}?text=${encodeURIComponent(mensaje)}`;
+      window.open(url, '_blank');
+    }
+
+    // ---------- TABLA DE AMORTIZACIÓN ----------
+    function buildAmort(monto, anual, ivaPct, plazo, ppy, dispMonto, hayDisp) {
+      const isEfi = productoActual === 'efi';
+      const i = anual / 100 / ppy;
+      const pagoBase = paymentBase(monto, i, plazo);
+      const pagoPeriodico = isEfi ? pagoBase : pagoBase * (1 + ivaPct / 100);
+      let saldo = monto;
+      const rows = [];
+      let totalCapital = 0,
+        totalInteres = 0,
+        totalPagos = 0;
+
+      for (let k = 1; k <= plazo; k++) {
+        const interes = saldo * i;
+        const capital = pagoBase - interes;
+        saldo -= capital;
+        if (saldo < 0.01) saldo = 0;
+        const cargoDisp = (hayDisp && k === 1) ? dispMonto : 0;
+        const pagoPeriodo = pagoPeriodico + cargoDisp;
+        rows.push(`<tr class="${k === 1 ? 'first-row' : ''}" style="${k === 1 ? 'background:#fff3cd;' : ''}">
+          <td style="padding:3px 4px;text-align:center;font-weight:700;">${k}</td>
+          <td style="padding:3px 4px;text-align:right;">${money(pagoPeriodo)}</td>
+          <td style="padding:3px 4px;text-align:right;">${money(capital)}</td>
+          <td style="padding:3px 4px;text-align:right;">${money(interes)}</td>
+          <td style="padding:3px 4px;text-align:right;">${money(Math.max(0, saldo))}</td>
+        </tr>`);
+        totalCapital += capital;
+        totalInteres += interes;
+        totalPagos += pagoPeriodo;
+      }
+
+      rows.push(`<tr class="total-row" style="font-weight:900;border-top:2px solid var(--teal);background:var(--card) !important;">
+        <td style="padding:3px 4px;text-align:center;font-weight:700;"><b>TOTAL</b></td>
+        <td style="padding:3px 4px;text-align:right;"><b>${money(totalPagos)}</b></td>
+        <td style="padding:3px 4px;text-align:right;"><b>${money(totalCapital)}</b></td>
+        <td style="padding:3px 4px;text-align:right;"><b>${money(totalInteres)}</b></td>
+        <td style="padding:3px 4px;text-align:right;">—</td>
+      </tr>`);
+
+      $('amortBody').innerHTML = rows.join('');
+    }
+
+    // ---------- TOGGLES ----------
+    $('showAmort').addEventListener('change', e => {
+      const show = e.target.checked;
+      localStorage.setItem('showAmort', show ? '1' : '0');
+      $('amortSection').classList.toggle('show', show);
+    });
+    if (localStorage.getItem('showAmort') === '1') {
+      $('showAmort').checked = true;
+      $('amortSection').classList.add('show');
+    }
+
+    // Eventos corregidos para disposición y seguro
+    $('aplicaDisp').addEventListener('change', e => {
+      $('dispFields').classList.toggle('show', e.target.checked);
+      calc();
+    });
+    $('aplicaSeguro').addEventListener('change', e => {
+      $('seguroFields').classList.toggle('show', e.target.checked);
+      calc();
+    });
+    ['dispPct', 'seguroMonto', 'ajusteBBVA'].forEach(id => {
+      if ($(id)) $(id).addEventListener('change', () => calc());
+    });
+
+    // ---------- TOGGLES VISUALES ----------
+    $('showBars').addEventListener('change', e => {
+      const show = e.target.checked;
+      localStorage.setItem('showBars', show ? '1' : '0');
+      $('barChart').style.display = show ? 'flex' : 'none';
+      if (show && $('technical') && !$('technical').classList.contains('show')) {
+        $('technical').classList.add('show');
+        if ($('showTech')) $('showTech').checked = true;
+      }
+    });
+    if (localStorage.getItem('showBars') === '1') {
+      $('showBars').checked = true;
+      $('barChart').style.display = 'flex';
+      if ($('technical') && !$('technical').classList.contains('show')) {
+        $('technical').classList.add('show');
+        if ($('showTech')) $('showTech').checked = true;
+      }
+    }
+
+    $('showResumen').addEventListener('change', e => {
+      document.body.classList.toggle('hide-resumen', !e.target.checked);
+      localStorage.setItem('showResumen', e.target.checked ? '1' : '0');
+    });
+    const savedResumen = localStorage.getItem('showResumen');
+    if (savedResumen === '0') {
+      $('showResumen').checked = false;
+      document.body.classList.add('hide-resumen');
+    }
+
+    $('showTech').addEventListener('change', e => $('technical').classList.toggle('show', e.target.checked));
+
+    // ---------- MODO CLIENTE ----------
+    function setModoCliente(on) {
+      document.body.classList.toggle('modo-cliente', on);
+      $('modoCliente').checked = on;
+      localStorage.setItem('modoCliente', on ? '1' : '0');
+      const btn = $('fabClienteBtn');
+      if (on) {
+        btn.textContent = '👤 Salir';
+        btn.classList.add('active');
+      } else {
+        btn.textContent = '👤 Cliente';
+        btn.classList.remove('active');
+      }
+      const iaPanel = $('iaPanel');
+      if (on) iaPanel.style.display = 'none';
+      else iaPanel.classList.contains('show') ? iaPanel.style.display = '' : iaPanel.style.display = 'none';
+    }
+
+    $('modoCliente').addEventListener('change', e => setModoCliente(e.target.checked));
+    $('modoClienteBadge').addEventListener('click', () => setModoCliente(false));
+    $('fabClienteBtn').addEventListener('click', function() {
+      const currentlyOn = document.body.classList.contains('modo-cliente');
+      setModoCliente(!currentlyOn);
+    });
+    if (localStorage.getItem('modoCliente') === '1') setModoCliente(true);
+
+    // ---------- DARK MODE ----------
+    function applyDark(on) {
+      document.documentElement.setAttribute('data-dark', on ? '1' : '0');
+      $('darkIcon').textContent = on ? '☀️' : '🌙';
+      $('darkSwitch').checked = on;
+      localStorage.setItem('darkMode', on ? '1' : '0');
+    }
+    $('darkSwitch').addEventListener('change', e => applyDark(e.target.checked));
+    applyDark(localStorage.getItem('darkMode') === '1');
+
+    // ---------- HISTORIAL ---------- (funciones completas)
+    function guardarSimulacion() {
+      const cliente = $('cliente').value.trim() || 'Sin nombre';
+      const monto = read('monto');
+      const plazo = read('plazo');
+      const tasa = read('interes');
+      const pago = $('pagoResumen').textContent;
+      const fecha = today();
+      const producto = productoActual === 'efi' ? 'EFI' : 'Crédito';
+      const unidad = unidadActual();
+
+      const simulacion = {
+        id: Date.now(),
+        fecha,
+        cliente,
+        monto,
+        plazo,
+        tasa,
+        pago,
+        producto,
+        unidad,
+        params: {
+          cliente: $('cliente').value,
+          monto: $('monto').value,
+          plazo: $('plazo').value,
+          interes: $('interes').value,
+          iva: $('iva').value,
+          producto: productoActual,
+          unidad: unidadActual(),
+          aplicaDisp: $('aplicaDisp').checked,
+          dispPct: $('dispPct').value,
+          aplicaSeguro: $('aplicaSeguro').checked,
+          seguroMonto: $('seguroMonto').value,
+          ingresos: $('ingresos').value
+        }
+      };
+
+      let historial = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+      historial.unshift(simulacion);
+      if (historial.length > 50) historial = historial.slice(0, 50);
+      localStorage.setItem('historialSimulaciones', JSON.stringify(historial));
+      mostrarHistorial();
+      actualizarEstadisticas();
+      mostrarMensaje('✅ Simulación guardada correctamente');
+    }
+
+    function cargarSimulacion(id) {
+      const historial = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+      const item = historial.find(s => s.id === id);
+      if (!item) return;
+
+      const p = item.params;
+      $('cliente').value = p.cliente || '';
+      $('monto').value = p.monto || '';
+      $('iva').value = p.iva || '16';
+      if (p.ingresos) $('ingresos').value = p.ingresos;
+
+      const prod = p.producto || 'credito';
+      document.querySelectorAll('.producto-toggle-wrap [role="tab"]').forEach(el => {
+        const isActive = el.dataset.producto === prod;
+        el.classList.toggle('active', isActive);
+        el.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        el.setAttribute('tabindex', isActive ? '0' : '-1');
+      });
+      aplicarProducto(prod);
+
+      const unidad = p.unidad || 'quincena';
+      const radio = document.querySelector(`input[name="unidad"][value="${unidad}"]`);
+      if (radio) radio.checked = true;
+      applyUnidadUI();
+
+      if (p.plazo) $('plazo').value = p.plazo;
+      if (p.interes) $('interes').value = p.interes;
+
+      $('aplicaDisp').checked = p.aplicaDisp || false;
+      $('dispFields').classList.toggle('show', p.aplicaDisp || false);
+      $('dispPct').value = p.dispPct || '0';
+      $('aplicaSeguro').checked = p.aplicaSeguro || false;
+      $('seguroFields').classList.toggle('show', p.aplicaSeguro || false);
+      $('seguroMonto').value = p.seguroMonto || '0';
+
+      calc();
+      mostrarMensaje('📂 Simulación cargada correctamente');
+    }
+
+    function eliminarSimulacion(id) {
+      let historial = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+      historial = historial.filter(s => s.id !== id);
+      localStorage.setItem('historialSimulaciones', JSON.stringify(historial));
+      mostrarHistorial();
+      actualizarEstadisticas();
+    }
+
+    function limpiarHistorial() {
+      if (confirm('¿Eliminar todas las simulaciones guardadas?')) {
+        localStorage.removeItem('historialSimulaciones');
+        mostrarHistorial();
+        actualizarEstadisticas();
+        mostrarMensaje('🗑️ Historial limpiado');
+      }
+    }
+
+    function renderHistorialItem(item) {
+      return `
+        <div class="historial-item" style="background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:4px 8px;display:flex;justify-content:space-between;align-items:center;font-size:11px;transition:0.2s;">
+          <div class="datos" onclick="cargarSimulacion(${item.id})" style="flex:1;display:flex;flex-direction:column;gap:1px;cursor:pointer;">
+            <div class="fecha" style="font-weight:700;color:var(--navy);">${item.fecha} • ${item.producto}</div>
+            <div class="detalle" style="color:var(--muted);font-size:10px;">${item.cliente} • ${money(item.monto)} • ${item.plazo} ${item.unidad === 'quincena' ? 'q' : 'm'}</div>
+          </div>
+          <div class="acciones" style="display:flex;gap:3px;">
+            <button class="cargar" onclick="cargarSimulacion(${item.id})" style="background:var(--teal);color:white;border:0;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;cursor:pointer;">Cargar</button>
+            <button class="eliminar" onclick="eliminarSimulacion(${item.id})" title="Eliminar" style="background:transparent;border:0;color:#dc2626;font-size:14px;cursor:pointer;padding:0 2px;">✕</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function filtrarHistorial(historial) {
+      const q = ($('historialSearch') ? $('historialSearch').value : '').trim().toLowerCase();
+      if (!q) return historial;
+      return historial.filter(item => (item.cliente || '').toLowerCase().includes(q));
+    }
+
+    function agruparPorCliente(historial) {
+      const grupos = {};
+      historial.forEach(item => {
+        const key = (item.cliente || 'Sin nombre').trim() || 'Sin nombre';
+        if (!grupos[key]) grupos[key] = [];
+        grupos[key].push(item);
+      });
+      return grupos;
+    }
+
+    function renderClienteGrid(historial) {
+      const grid = $('clienteGrid');
+      const grupos = agruparPorCliente(historial);
+      const nombres = Object.keys(grupos).sort((a, b) => {
+        return grupos[b][0].id - grupos[a][0].id;
+      });
+      if (nombres.length === 0) {
+        grid.innerHTML = '<div class="hint" style="padding:6px;text-align:center;font-size:11px;">No se encontraron clientes.</div>';
+        return;
+      }
+      grid.innerHTML = nombres.map(nombre => {
+        const sims = grupos[nombre];
+        const ultima = sims[0];
+        const montos = sims.map(s => s.monto).filter(m => m > 0);
+        const promedio = montos.length ? montos.reduce((a, b) => a + b, 0) / montos.length : 0;
+        const key = encodeURIComponent(nombre).replace(/'/g, '%27');
+        return `
+          <div class="cliente-card" onclick="verDetalleCliente('${key}')" style="background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:6px 8px;cursor:pointer;transition:0.2s;">
+            <div class="cliente-nombre" style="font-weight:700;color:var(--navy);font-size:12px;">${nombre}</div>
+            <div class="cliente-sub" style="color:var(--muted);font-size:10px;margin-top:1px;">Última: ${ultima.fecha} • ${money(ultima.monto)}</div>
+            <div class="cliente-badges" style="display:flex;gap:3px;margin-top:2px;flex-wrap:wrap;">
+              <span class="badge" style="background:rgba(0,180,160,0.12);color:var(--teal);font-size:9px;font-weight:700;padding:1px 4px;border-radius:999px;">${sims.length} sim</span>
+              <span class="badge" style="background:rgba(0,180,160,0.12);color:var(--teal);font-size:9px;font-weight:700;padding:1px 4px;border-radius:999px;">prom. ${money(promedio)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function verDetalleCliente(encodedNombre) {
+      const nombre = decodeURIComponent(encodedNombre);
+      const historial = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+      const sims = historial.filter(s => ((s.cliente || 'Sin nombre').trim() || 'Sin nombre') === nombre);
+      const detalle = $('clienteDetalle');
+      $('clienteGrid').style.display = 'none';
+      detalle.style.display = 'block';
+      detalle.innerHTML = `
+        <button class="volver" onclick="cerrarDetalleCliente()" style="background:transparent;border:0;color:var(--teal);font-weight:700;font-size:11px;cursor:pointer;padding:0 0 4px;display:inline-flex;align-items:center;gap:3px;">← Volver</button>
+        <h4 style="margin:4px 0 4px;color:var(--navy);font-size:13px;">${nombre} <span class="hint" style="display:inline;font-size:11px;color:var(--muted);">(${sims.length} sim)</span></h4>
+        <div class="historial-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px;margin-top:4px;">${sims.map(renderHistorialItem).join('')}</div>
+      `;
+    }
+    window.verDetalleCliente = verDetalleCliente;
+
+    function cerrarDetalleCliente() {
+      $('clienteDetalle').style.display = 'none';
+      $('clienteGrid').style.display = '';
+    }
+    window.cerrarDetalleCliente = cerrarDetalleCliente;
+
+    function actualizarDatalistClientes() {
+      const datalist = $('clientesDatalist');
+      if (!datalist) return;
+      const historial = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+      const nombres = [...new Set(historial.map(s => (s.cliente || '').trim()).filter(Boolean))];
+      const esc = s => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+      datalist.innerHTML = nombres.map(n => `<option value="${esc(n)}"></option>`).join('');
+    }
+
+    function mostrarHistorial() {
+      const grid = $('historialGrid');
+      const clienteGrid = $('clienteGrid');
+      const detalle = $('clienteDetalle');
+      const agrupado = $('agruparClienteChk') && $('agruparClienteChk').checked;
+      const historialCompleto = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+      const historial = filtrarHistorial(historialCompleto);
+      actualizarDatalistClientes();
+
+      detalle.style.display = 'none';
+      detalle.innerHTML = '';
+
+      if (agrupado) {
+        grid.style.display = 'none';
+        clienteGrid.style.display = '';
+        setText('historialHint', 'Haz clic en un cliente para ver todas sus simulaciones.');
+        renderClienteGrid(historial);
+        return;
+      }
+
+      grid.style.display = '';
+      clienteGrid.style.display = 'none';
+      setText('historialHint', 'Haz clic en un registro para cargar sus datos. Cada simulación se guarda con los parámetros que usaste.');
+
+      if (historialCompleto.length === 0) {
+        grid.innerHTML = '<div class="hint" style="padding:6px;text-align:center;font-size:11px;">No hay simulaciones guardadas aún.</div>';
+        return;
+      }
+      if (historial.length === 0) {
+        grid.innerHTML = '<div class="hint" style="padding:6px;text-align:center;font-size:11px;">No se encontraron simulaciones para ese cliente.</div>';
+        return;
+      }
+      grid.innerHTML = historial.map(renderHistorialItem).join('');
+    }
+    window.cargarSimulacion = cargarSimulacion;
+    window.eliminarSimulacion = eliminarSimulacion;
+
+    $('guardarBtn').addEventListener('click', guardarSimulacion);
+    $('limpiarHistorialBtn').addEventListener('click', limpiarHistorial);
+    if ($('historialSearch')) $('historialSearch').addEventListener('input', mostrarHistorial);
+    if ($('agruparClienteChk')) {
+      $('agruparClienteChk').checked = localStorage.getItem('historialAgrupado') === '1';
+      $('agruparClienteChk').addEventListener('change', (e) => {
+        localStorage.setItem('historialAgrupado', e.target.checked ? '1' : '0');
+        mostrarHistorial();
+      });
+    }
+
+    // ---------- ESTADÍSTICAS ----------
+    function actualizarEstadisticas() {
+      const historial = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+      const total = historial.length;
+      const montos = historial.map(s => s.monto).filter(m => m > 0);
+      const promedio = montos.length ? montos.reduce((a, b) => a + b, 0) / montos.length : 0;
+      const creditos = historial.filter(s => s.producto === 'Crédito').length;
+      const efis = historial.filter(s => s.producto === 'EFI').length;
+
+      setText('statTotal', total);
+      setText('statPromedio', money(promedio));
+      setText('statCredito', creditos);
+      setText('statEFI', efis);
+    }
+
+    // ---------- EXPORTAR PDF ----------
+    async function exportarPDF() {
+      const btn = $('pdfBtn');
+      btn.textContent = '⏳ Generando...';
+      btn.disabled = true;
+      showLoader();
+
+      const tools = document.querySelector('.tools');
+      const cardFooter = $('cardFooter');
+      const fabContainer = $('fabContainer');
+      const wasToolsHidden = tools.style.display === 'none';
+      const wasCardFooterHidden = cardFooter.style.display === 'none';
+
+      try {
+        if (tools) tools.style.display = 'none';
+        if (cardFooter) cardFooter.style.display = 'none';
+        if (fabContainer) fabContainer.style.display = 'none';
+
+        const element = $('mainCard');
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+          logging: false,
+          windowWidth: 980
+        });
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const imgWidth = 210;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        if (heightLeft > 297) {
+          while (heightLeft > 0) {
+            const y = position * 297;
+            pdf.addImage(imgData, 'JPEG', 0, -y, imgWidth, imgHeight);
+            heightLeft -= 297;
+            position++;
+            if (heightLeft > 0) pdf.addPage();
+          }
+        } else {
+          pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+        }
+
+        pdf.save(`Simulacion_${ultimosValores.cliente || 'cliente'}.pdf`);
+        mostrarMensaje('📄 PDF generado correctamente');
+      } catch (error) {
+        console.error('Error generando PDF:', error);
+        mostrarMensaje('❌ Error al generar el PDF', true);
+      }
+
+      if (tools) tools.style.display = wasToolsHidden ? 'none' : '';
+      if (cardFooter) cardFooter.style.display = wasCardFooterHidden ? 'none' : '';
+      if (fabContainer) fabContainer.style.display = '';
+
+      hideLoader();
+      btn.textContent = '📄 PDF';
+      btn.disabled = false;
+    }
+    $('pdfBtn').addEventListener('click', exportarPDF);
+
+    // ---------- ENVIAR POR CORREO ----------
+    function enviarPorCorreo() {
+      const v = ultimosValores;
+      if (!v || !v.monto) {
+        mostrarMensaje('❌ Primero debes calcular una simulación.', true);
+        return;
+      }
+      showLoader();
+      try {
+        const advisor = getAdvisorData();
+        const asunto = encodeURIComponent(`Simulación de crédito para ${v.cliente}`);
+        const cuerpo = encodeURIComponent(`
+        Simulación de Crédito/EFI
+
+        Cliente: ${v.cliente}
+        Producto: ${v.isEfi ? 'EFI' : 'Crédito'}
+        Monto: ${money(v.monto)}
+        Plazo: ${v.plazo} ${v.unidad === 'quincena' ? 'quincenas' : 'meses'}
+        Tasa anual: ${v.anual}%
+        Pago ${unidadCorta(v.unidad)}: ${money(v.pagoPeriodico)}
+        ${v.mostrarPrimerPago ? `Primer pago (disposición): ${money(v.primerPago)}` : ''}
+        ${v.haySeguro ? `Seguro: ${money(v.seguroMonto)}` : ''}
+        ${v.haySeguro ? `Monto neto a recibir: ${money(v.montoNeto)}` : ''}
+        ---
+        Simulación generada con la herramienta de ${advisor.name}
+        WhatsApp: ${formatPhone(advisor.phone)}
+      `);
+
+        window.location.href = `mailto:?subject=${asunto}&body=${cuerpo}`;
+        mostrarMensaje('✉️ Se abrió tu cliente de correo.');
+      } catch (e) {
+        mostrarMensaje('❌ Error al abrir el correo.', true);
+      }
+      hideLoader();
+    }
+    $('emailBtn').addEventListener('click', enviarPorCorreo);
+
+    // ---------- CAPTURA DE IMAGEN ----------
+    $('captureBtn').addEventListener('click', async () => {
+      const target = $('mainCard');
+      const btn = $('captureBtn');
+      btn.textContent = '⏳ Generando…';
+      btn.disabled = true;
+      showLoader();
+
+      const tools = document.querySelector('.tools');
+      const cardFooter = $('cardFooter');
+      const fabContainer = $('fabContainer');
+      const wasToolsHidden = tools.style.display === 'none';
+      const wasCardFooterHidden = cardFooter.style.display === 'none';
+      const fabWasShown = fabContainer && fabContainer.classList.contains('show');
+
+      try {
+        if (tools) tools.style.display = 'none';
+        if (cardFooter) cardFooter.style.display = 'none';
+        if (fabContainer) fabContainer.classList.remove('show');
+
+        const isDark = document.documentElement.getAttribute('data-dark') === '1';
+        const canvas = await html2canvas(target, {
+          scale: 2.5,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: isDark ? '#1e293b' : '#ffffff',
+          windowWidth: 980,
+          onclone: (doc) => {
+            doc.querySelectorAll('*').forEach(el => {
+              el.style.fontFamily = 'Inter, Arial, Helvetica, sans-serif';
+              el.style.letterSpacing = '0.01em';
+              el.style.wordSpacing = '0.12em';
+              el.style.lineHeight = '1.35';
+            });
+          }
+        });
+        const link = document.createElement('a');
+        const cliente = $('cliente').value.trim() || 'simulacion';
+        link.download = `Credito_${cliente.replace(/\s+/g, '_')}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        mostrarMensaje('📸 Imagen guardada');
+      } catch (err) {
+        alert('No se pudo generar la imagen. Intenta de nuevo.');
+      }
+
+      if (tools) tools.style.display = wasToolsHidden ? 'none' : '';
+      if (cardFooter) cardFooter.style.display = wasCardFooterHidden ? 'none' : '';
+      if (fabContainer && fabWasShown) fabContainer.classList.add('show');
+
+      hideLoader();
+      btn.textContent = '📸 Capturar';
+      btn.disabled = false;
+    });
+
+    // ---------- RESTABLECER ----------
+    $('resetBtn').addEventListener('click', function() {
+      if (productoActual !== 'credito') {
+        aplicarProducto('credito');
+      } else {
+        $('monto').value = '46700';
+        $('plazo').value = '120';
+        $('interes').value = '37.47';
+        $('iva').value = '16';
+        $('cliente').value = '';
+        $('ingresos').value = '';
+        $('aplicaDisp').checked = false;
+        $('dispFields').classList.remove('show');
+        $('dispPct').value = '2.75';
+        $('aplicaSeguro').checked = false;
+        $('seguroFields').classList.remove('show');
+        $('seguroMonto').value = '2098.41';
+        calc();
+      }
+      mostrarMensaje('↺ Valores restablecidos');
+    });
+
+    // ---------- EVENTOS ----------
+    loadAdvisorData();
+    ['advisorInput', 'advisorPhoneInput'].forEach(id => {
+      if ($(id)) $(id).addEventListener('change', () => { saveAdvisorData();
+        calc(); });
+    });
+    $('calcBtn').addEventListener('click', () => calc());
+    $('printBtn').addEventListener('click', () => window.print());
+    $('waBtn').addEventListener('click', updateWhatsAppLink);
+    $('waClienteBtn').addEventListener('click', enviarWhatsAppCliente);
+
+    // ---------- CÁLCULO EN VIVO ----------
+    let liveCalcTimer = null;
+
+    function calcEnVivo() {
+      clearTimeout(liveCalcTimer);
+      liveCalcTimer = setTimeout(() => calc(true), 300);
+    }
+    ['cliente', 'monto', 'plazo', 'interes', 'iva', 'ingresos'].forEach(id => {
+      const el = $(id);
+      if (el) el.addEventListener('input', calcEnVivo);
+    });
+
+    // ---------- BOTÓN FLOTANTE ----------
+    const fabContainer = $('fabContainer');
+    if (fabContainer) {
+      $('fabCalcBtn').addEventListener('click', () => calc());
+
+      let fabTicking = false;
+
+      function actualizarFab() {
+        fabContainer.classList.toggle('show', window.scrollY > 160);
+        fabTicking = false;
+      }
+      window.addEventListener('scroll', () => {
+        if (!fabTicking) {
+          window.requestAnimationFrame(actualizarFab);
+          fabTicking = true;
+        }
+      }, { passive: true });
+      actualizarFab();
+    }
+
+    function restaurarUltimosValores() {
+      const lastMonto = localStorage.getItem('lastMonto');
+      const lastPlazo = localStorage.getItem('lastPlazo');
+      const lastInteres = localStorage.getItem('lastInteres');
+      if (lastMonto) $('monto').value = lastMonto;
+      if (lastPlazo) $('plazo').value = lastPlazo;
+      if (lastInteres) $('interes').value = lastInteres;
+    }
+
+    // ---------- INICIALIZACIÓN ----------
+    applyUnidadUI();
+    aplicarProducto(productoActual);
+    restaurarUltimosValores();
+    calc(true);
+    mostrarHistorial();
+    actualizarEstadisticas();
+
+    document.querySelectorAll('.fade-slide').forEach(el => el.classList.add('show'));
+  </script>
+</body>
+</html>
