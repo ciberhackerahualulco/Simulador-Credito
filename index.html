@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Simulador" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <title>Simulador de Crédito/EFI Pro v19.4</title>
+  <title>Simulador de Crédito/EFI Pro v19.4.1</title>
 
   <link rel="manifest" href="./manifest.json" />
   <link rel="apple-touch-icon" href="./icons/icon-192.png" />
@@ -685,7 +685,7 @@ body.modo-cliente .dark-fab{display:none}
 @media screen { #cardFooter, #pageFooter { display: none !important; } }
 @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
 
-/* v19.4: compact glass interface */
+/* v19.4.1: compact glass interface */
 .hero-meta{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;padding-right:22px}
 .hero-meta .pill,.hero-meta .date-line{margin:0;font-size:10px;white-space:nowrap}
 .hero-meta .date-line{opacity:1;color:#fff}
@@ -713,19 +713,19 @@ body[data-product="efi"] .sticky-summary{background:rgba(5,48,36,.85)}
 @media print{.sticky-summary{display:none!important}}
 
 
-/* v19.4: compact actions and presentation */
+/* v19.4.1: compact actions and presentation */
 .share-menu{margin-top:10px;border:1px solid var(--line);border-radius:14px;background:var(--card);overflow:hidden;box-shadow:var(--shadow)}
 .share-menu summary{cursor:pointer;padding:13px;font-weight:800;color:var(--brand-mid);list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:44px}
 .share-menu summary::-webkit-details-marker{display:none}.share-menu summary::after{content:'+';font-size:20px}.share-menu[open] summary::after{content:'−'}
 .share-menu .tools{padding:0 10px 10px;margin:0}.share-menu .tool-btn{min-height:44px}
 .quick-actions{display:flex;gap:8px;margin-top:10px}.quick-actions button{flex:1;justify-content:center;min-height:44px}
 .client-only{display:none}.client-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.client-facts .mini-card{display:block;padding:10px}.client-facts .mini-value{font-size:16px}
-body.modo-cliente .client-only{display:block}body.modo-cliente .client-facts{display:grid}body.modo-cliente .resumen-aside,body.modo-cliente .hero,body.modo-cliente #accResultado>.accordion-header,body.modo-cliente #advisorTopDisplay,body.modo-cliente .advisor-top,body.modo-cliente #waClienteBtn,body.modo-cliente #copyPhoneBtn,body.modo-cliente .creditbar,body.modo-cliente .sticky-summary{display:none!important}
+body.modo-cliente .client-only{display:block}body.modo-cliente .client-facts{display:grid}body.modo-cliente .resumen-aside,body.modo-cliente .hero,body.modo-cliente #accResultado>.accordion-header,body.modo-cliente #advisorTopDisplay,body.modo-cliente .advisor-top,body.modo-cliente #waClienteBtn,body.modo-cliente #copyPhoneBtn,body.modo-cliente .sticky-summary{display:none!important}
 body.modo-cliente .grid{grid-template-columns:1fr}body.modo-cliente #mainCard{max-width:620px;margin:auto;padding:16px}body.modo-cliente #accResultado{border:0!important;box-shadow:none}body.modo-cliente .contact-card{box-shadow:none;border:1px solid var(--line)}body.modo-cliente .contact-actions{grid-template-columns:1fr}body.modo-cliente .fab-cliente.active{animation:none;background:var(--brand-mid)}
 body.modo-cliente .wrap{padding-top:14px}body.modo-cliente .amount-card{padding:14px}body.modo-cliente .amount-value{font-size:28px}
 @media print{.share-menu,.quick-actions{display:none!important}.client-only{display:none!important}body.modo-cliente .client-only{display:block!important}body.modo-cliente .client-facts{display:grid!important}}
 
-/* v19.4 Compact Glass: shared tokens and responsive navigation */
+/* v19.4.1 Compact Glass: shared tokens and responsive navigation */
 body{--nav-bg:rgba(255,255,255,.94);--nav-text:#334155;--nav-active:#dbeafe;--nav-ink:#123b78}
 body[data-product="efi"]{--nav-active:#d1fae5;--nav-ink:#065f46}
 [data-dark="1"] body[data-product]{--bg:#000;--card:#0c0e10;--line:#293038;--nav-bg:rgba(13,17,21,.94);--nav-text:#b4becb;--nav-active:#172c42;--nav-ink:#b4d4ff}
@@ -734,7 +734,7 @@ body[data-product="efi"]{--nav-active:#d1fae5;--nav-ink:#065f46}
 #proNav button{display:flex;flex-direction:column;gap:3px;justify-content:center;min-height:48px;background:transparent;color:var(--nav-text);font-size:11px;padding:5px;border-radius:12px}
 #proNav button[aria-pressed="true"]{background:var(--nav-active);color:var(--nav-ink)}
 #proNav svg,.client-top svg,#compactQR svg{width:22px;height:22px;flex:none}
-.creditbar{display:none}.fab-container{bottom:calc(76px + env(safe-area-inset-bottom,0px))}.wrap{padding-bottom:150px}
+.fab-container{bottom:calc(76px + env(safe-area-inset-bottom,0px))}.wrap{padding-bottom:150px}
 body[data-view]:not([data-view="sim"]) .fab-container,body[data-view]:not([data-view="sim"]):not(.exporting) #accResultado,body[data-view]:not([data-view="sim"]) .sticky-summary{display:none!important}
 body[data-view="sim"] #statsSection,body[data-view="sim"] #historialSection,body[data-view="sim"] #shareMenu,body[data-view="sim"] #advancedToggle,body[data-view="sim"] #advancedContent,body[data-view="sim"] #advisorPanel>.section-divider:nth-of-type(2){display:none!important}
 body[data-view="history"] #advisorPanel>:not(#statsSection):not(#historialSection):not(#msg),body[data-view="share"] #advisorPanel>:not(#shareMenu):not(#msg),body[data-view="settings"] #advisorPanel>:not(#accAsesor):not(#advancedToggle):not(#advancedContent):not(#msg){display:none!important}
@@ -747,6 +747,17 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
 </style>
 <style>
 #updateNotice[hidden]{display:none!important} #updateNotice{position:fixed;z-index:1500;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(92%,420px);padding:14px;border:1px solid var(--brand-mid);border-radius:16px;background:var(--card);color:var(--text);box-shadow:0 8px 30px #0004;backdrop-filter:blur(18px)} #updateNotice p{font-size:12px;margin:5px 0 10px} body.modo-cliente #updateNotice{display:none!important} #comparison td,#comparison th{font-size:10px;padding:4px 3px} @media(max-width:600px){#technical>div{grid-template-columns:1fr!important}} @media print{#updateNotice{display:none!important}}
+</style><style>
+/* Attribution below navigation, including safe area. */
+.creditbar{display:block;z-index:560;min-height:22px;line-height:14px;background:var(--nav-bg);color:var(--muted);font-size:10px;padding:4px 8px calc(4px + env(safe-area-inset-bottom,0px));}
+#proNav{bottom:calc(22px + env(safe-area-inset-bottom,0px));padding-bottom:6px}
+.fab-container{bottom:calc(94px + env(safe-area-inset-bottom,0px))}.wrap{padding-bottom:175px}
+body.modo-cliente .wrap{padding-bottom:calc(38px + env(safe-area-inset-bottom,0px))}
+.client-facts.client-only{display:none}body.modo-cliente .client-facts.client-only,body.exporting .client-facts.client-only{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+body.modo-cliente .client-facts .mini-card{flex-direction:column;align-items:flex-start;gap:2px;padding:8px}
+body.modo-cliente .client-facts .mini-card.full{grid-column:1/-1}
+body.exporting .resumen-aside{display:none!important}body.exporting .grid{grid-template-columns:1fr}body.exporting .contact-actions,body.exporting #copyPhoneBtn{display:none!important}
+@media print{.creditbar{display:none!important}.client-facts.client-only{display:grid!important}.resumen-aside{display:none!important}.grid{grid-template-columns:1fr!important}}
 </style></head>
 <body data-product="credito">
 
@@ -790,7 +801,7 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
     <div class="hero">
       <div class="product-ribbon" id="productRibbon">💼 CRÉDITO</div>
       <h1 id="tituloPrincipal">Simulador de Crédito/EFI Pro</h1>
-      <div class="hero-meta"><span class="pill">Herramienta de Apoyo Comercial · v19.4</span><span class="date-line">📅 <b id="fechaSim"></b></span></div>
+      <div class="hero-meta"><span class="pill">Herramienta de Apoyo Comercial · v19.4.1</span><span class="date-line">📅 <b id="fechaSim"></b></span></div>
       <div class="prod-row">
       <div class="producto-toggle-wrap" id="productoToggleWrap" role="tablist">
         <span class="label-credito active" id="labelCredito" data-producto="credito" role="tab" aria-selected="true" tabindex="0">💼 Crédito</span>
@@ -1035,7 +1046,7 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
         <div class="toggle"><div style="font-size:12px;"><b>📊 Gráfica de barras</b></div><label class="switch"><input type="checkbox" id="showBars"><span class="slider"></span></label></div>
         <div class="toggle"><div style="font-size:12px;"><b>📋 Tabla de amortización</b></div><label class="switch"><input type="checkbox" id="showAmort"><span class="slider"></span></label></div>
         <div class="toggle"><div style="font-size:12px;"><b>🧠 Orientacion por reglas</b><div class="hint" style="font-size:10px;">Mostrar sugerencias personalizadas</div></div><label class="switch"><input type="checkbox" id="showIA"><span class="slider"></span></label></div>
-        <div class="toggle"><div style="font-size:12px;"><b>🗂️ Mostrar resumen</b></div><label class="switch"><input type="checkbox" id="showResumen" checked><span class="slider"></span></label></div>
+        <div class="toggle"><div style="font-size:12px;"><b>🗂️ Mostrar resumen</b></div><label class="switch"><input type="checkbox" id="showResumen"><span class="slider"></span></label></div>
         <div class="toggle"><label for="soundEnabled">Sonido de botones</label><input type="checkbox" id="soundEnabled" style="width:22px;height:22px" checked></div>
         <button type="button" class="btn-defaults" id="resetDefaultsBtn">↺ Restablecer valores por defecto</button>
       </div>
@@ -1136,7 +1147,7 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
       <div id="creatorLegend">
         <div style="font-weight:700;color:var(--brand-dark);">✍️ • Herramienta de Simulación Desarrollada por</div>
         <div style="font-weight:900;color:var(--gold);">Abraham Fernando Ulloa O.</div>
-        <div style="font-weight:700;color:var(--brand-dark);font-size:10.5px;margin-top:2px;">Para apoyo comercial • Simulación informativa sujeta a evaluación • v19.4</div>
+        <div style="font-weight:700;color:var(--brand-dark);font-size:10.5px;margin-top:2px;">Para apoyo comercial • Simulación informativa sujeta a evaluación • v19.4.1</div>
       </div>
     </div>
   </div>
@@ -1149,6 +1160,7 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
   (function(){
     'use strict';
     const $ = id => document.getElementById(id);
+    function readArray(key, fallback=[]) { try { const v=JSON.parse(localStorage.getItem(key)); return Array.isArray(v)?v:fallback; } catch(e) { return fallback; } }
     const DEFAULT_ADVISOR_NAME = 'Abraham Fernando Ulloa O.';
     const DEFAULT_ADVISOR_PHONE = '3741179005';
 
@@ -1170,8 +1182,8 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
     const read = id => {
       const el = $(id);
       if (!el) return 0;
-      const raw = String(el.value).replace(/,/g, '');
-      return parseFloat(raw) || 0;
+      const raw = String(el.value).replace(/,/g, '').trim();
+      return raw ? Number(raw) : 0;
     };
     const today = () => new Date().toLocaleDateString('es-MX', { year: 'numeric', month: '2-digit', day: '2-digit' });
     const setText = (id, value) => { const el = $(id); if (el) el.textContent = value; };
@@ -1310,8 +1322,8 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
             localStorage.setItem('draft19',JSON.stringify(draft));
             requested=true; reg.waiting.postMessage('SKIP_WAITING');
           };
-          const check=()=>reg.update().then(show).catch(()=>{});
-          $('checkUpdate').onclick=async()=>{ await check(); if(!reg.waiting) showToast('Sin actualizacion pendiente detectada'); };
+          const check=()=>reg.update().then(()=>{show();return true;}).catch(()=>false);
+          $('checkUpdate').onclick=async()=>{ const ok=await check(); if(!ok) showToast('No se pudo comprobar la actualizacion'); else if(!reg.waiting && !reg.installing) showToast('Sin actualizacion pendiente detectada'); };
           window.addEventListener('online',check);
           document.addEventListener('visibilitychange',()=>{if(!document.hidden) check();});
           show(); check();
@@ -1625,7 +1637,8 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
         const raw = $(id).value.trim(), n = Number(raw);
         if (!raw || !Number.isFinite(n) || n < 0 || (id==='seguroMonto' && n>=m) || (id==='iva' && n>100) || (id==='dispPct' && n>100)) fail(id,'Revisa '+id);
       }
-      if (!Number.isFinite(m) || !Number.isInteger(Number($('plazo').value))) fail('plazo','Monto o plazo invalido');
+      if (!Number.isFinite(m)) fail('monto','Monto invalido');
+      if (!Number.isInteger(Number($('plazo').value))) fail('plazo','Plazo invalido');
       if (primero && !silent) $(primero).focus();
       return ok;
     }
@@ -1846,8 +1859,8 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
       $('iaDetail').textContent = d + 'Sugerencias orientativas.';
     }
 
-    let activePlazosQuincena = new Set(JSON.parse(localStorage.getItem('activePlazosQuincena') || 'null') || [24,60,120,168]);
-    let activePlazosMes = new Set(JSON.parse(localStorage.getItem('activePlazosMes') || 'null') || [12,24,48,84]);
+    let activePlazosQuincena = new Set(readArray('activePlazosQuincena', [24,60,120,168]));
+    let activePlazosMes = new Set(readArray('activePlazosMes', [12,24,48,84]));
     const activePlazosFor = u => u === 'quincena' ? activePlazosQuincena : activePlazosMes;
     function saveActivePlazos(u) {
       localStorage.setItem(u === 'quincena' ? 'activePlazosQuincena' : 'activePlazosMes', JSON.stringify([...activePlazosFor(u)]));
@@ -2065,7 +2078,7 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
       document.body.classList.toggle('hide-resumen', !e.target.checked);
       localStorage.setItem('showResumen', e.target.checked ? '1' : '0');
     });
-    if (localStorage.getItem('showResumen') === '0') { $('showResumen').checked = false; document.body.classList.add('hide-resumen'); }
+    $('showResumen').checked = localStorage.getItem('showResumen') === '1'; document.body.classList.toggle('hide-resumen', !$('showResumen').checked);
 
     function applyDefaultsForCurrentProduct() {
       const p = productoActual;
@@ -2190,7 +2203,7 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
           ajusteBBVA: $('ajusteBBVA').checked
         }
       };
-      let h = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+      let h = readArray('historialSimulaciones');
       h.unshift(sim);
       if (h.length > 50) h = h.slice(0, 50);
       localStorage.setItem('historialSimulaciones', JSON.stringify(h));
@@ -2206,10 +2219,11 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
     function cargarSimulacion(id) {
       setView('sim', false);
       vibrate(10);
-      const h = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+      const h = readArray('historialSimulaciones');
       const it = h.find(s => s.id === id);
       if (!it) return;
       const p = it.params;
+      if (!p || typeof p !== 'object') { mostrarMensaje('Registro incompatible',true); return; }
       restoring = true;
       try { aplicarProducto(p.producto || 'credito'); $('cliente').value=''; $('clienteTel').value=''; $('ingresos').value=''; $('officialPayment').value=''; restoreFields(p); }
       finally { restoring=false; }
@@ -2217,7 +2231,7 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
       mostrarMensaje('📂 Cargada');
     }
     function eliminarSimulacion(id) {
-      let h = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+      let h = readArray('historialSimulaciones');
       h = h.filter(s => s.id !== id);
       localStorage.setItem('historialSimulaciones', JSON.stringify(h));
       mostrarHistorial(); actualizarEstadisticas();
@@ -2251,7 +2265,7 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
       const cGrid = $('clienteGrid');
       const det = $('clienteDetalle');
       const agr = $('agruparClienteChk').checked;
-      const full = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+      const full = readArray('historialSimulaciones');
       const h = filtrar(full);
       const dl = $('clientesDatalist');
       const nombres = [...new Set(full.map(s => (s.cliente||'').trim()).filter(Boolean))];
@@ -2302,7 +2316,7 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
     window.eliminarSimulacion = eliminarSimulacion;
     window.verDetalleCliente = function(enc) {
       const nombre = decodeURIComponent(enc);
-      const h = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+      const h = readArray('historialSimulaciones');
       const sims = h.filter(s => ((s.cliente||'Sin nombre').trim()||'Sin nombre') === nombre);
       const det = $('clienteDetalle');
       $('clienteGrid').style.display = 'none';
@@ -2316,7 +2330,7 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
       $('clienteGrid').style.display = '';
     };
     function actualizarEstadisticas() {
-      const h = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
+      const h = readArray('historialSimulaciones');
       const m = h.map(s => s.monto).filter(x => x > 0);
       const prom = m.length ? m.reduce((a,b) => a+b, 0) / m.length : 0;
       setText('statTotal', h.length);
@@ -2585,7 +2599,7 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
     function updateSticky() {
       const y = window.scrollY;
       const sticky = $('stickySummary');
-      const show = document.querySelector('.hero').getBoundingClientRect().bottom < 0 && y > 0;
+      const show = document.body.dataset.view === 'sim' && !document.body.classList.contains('modo-cliente') && document.querySelector('.hero').getBoundingClientRect().bottom < 0 && y > 0;
       $('stickyBrand').tabIndex = show ? 0 : -1;
       sticky.inert = !show;
       sticky.classList.toggle('show', show);
@@ -2638,6 +2652,7 @@ body.modo-cliente #clienteDisplay{font-size:20px!important}body.modo-cliente .in
       if(view==='share') $('shareMenu').open=true;
       if(view==='settings') { $('advancedContent').classList.add('open'); $('advancedIcon').textContent='▼'; }
       if(scroll) window.scrollTo({top:0,behavior:'auto'});
+      updateSticky();
     }
     document.querySelectorAll('#proNav button').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
     setView('sim',false);
